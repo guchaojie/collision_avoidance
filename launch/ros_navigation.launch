@@ -1,24 +1,24 @@
 <launch>
   <!-- Laser Sensor -->
   <arg name="laser_type" default="hokuyo" />
-  <include file="$(find ros_collsion_avoidance)/laser/$(arg laser_type)_laser.launch" />                              
+  <include file="$(find ros_collision_avoidance)/laser/$(arg laser_type)_laser.launch" />
 
-  <!-- Map server -->  
-  <arg name="map_file" default="$(find ros_collsion_avoidance)/maps/lab-2017-09-02.yaml"/>                                    
-  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />                                        
+  <!-- Map server -->
+  <arg name="map_file" default="$(find ros_collision_avoidance)/maps/zizhu1-F4-lab-2017-09-06.yaml"/>
+  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
   
   <!-- AMCL -->
-  <arg name="initial_pose_x" default="0.0"/>                                            
+  <arg name="initial_pose_x" default="0.0"/>
   <arg name="initial_pose_y" default="0.0"/>
-  <arg name="initial_pose_a" default="0.0"/>  
-  <include file="$(find ros_collsion_avoidance)/launch/includes/amcl.launch.xml">
+  <arg name="initial_pose_a" default="0.0"/>
+  <include file="$(find ros_collision_avoidance)/launch/includes/amcl.launch.xml">
     <arg name="initial_pose_x" value="$(arg initial_pose_x)"/>
     <arg name="initial_pose_y" value="$(arg initial_pose_y)"/>
     <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
-  </include>                                                               
+  </include>
 
   <!-- Move Base -->
-  <include file="$(find ros_collsion_avoidance)/launch/includes/move_base.launch.xml"/>
+  <include file="$(find ros_collision_avoidance)/launch/includes/move_base.launch.xml"/>
 
 </launch>
 
