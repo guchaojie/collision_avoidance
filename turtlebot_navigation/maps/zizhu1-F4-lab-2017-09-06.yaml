@@ -1,4 +1,4 @@
-image: /home/ros/catkin_ws/src/AMR_ros_collision_avoidance/maps/zizhu1-F4-lab-2017-09-06.pgm
+image: /home/ros/catkin_ws/src/AMR_ros_collision_avoidance/turtlebot_navigation/maps/zizhu1-F4-lab-2017-09-06.pgm
 resolution: 0.050000
 origin: [-12.200000, -15.400000, 0.000000]
 negate: 0
