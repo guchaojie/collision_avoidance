@@ -13,7 +13,7 @@ catkin_package(
 ###########
 ## Build ##
 ###########
-include_directories(${catkin_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 # Add_executables
 add_executable(sonar_filter src/sonar_filter.cpp)
