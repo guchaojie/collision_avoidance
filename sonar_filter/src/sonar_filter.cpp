@@ -37,37 +37,79 @@
 #include <sensor_msgs/Range.h>
 #include <tf/transform_listener.h>
 
-class SonarFilter
-{
-public:
-  SonarFilter()
-    : nh_("~"), listener_(ros::Duration(10))
+#include <sonar_filter/sonar_filter.h>
+
+namespace intelligent_ca {
+
+
+  SonarFilter::SonarFilter()
+    : nh_("~"), listener_(ros::Duration(10)), 
+    last_sonar_data_(-1.0), sonar_hit_counts_(0),last_sonar_data_deprecated_(-1)
   {
     scan_filtered_pub_ = nh_.advertise<sensor_msgs::Range>("/sonar_filtered", 1);
     scan_sub_ = nh_.subscribe("/sonar", 1000, &SonarFilter::update, this);
 
     nh_.param<std::string>("base_frame", base_frame_, "/base_link");
+    
+    sonar_dist_tolerance_ = 0.3; //TODO:control it in parameter
   }
 
-  void update(const sensor_msgs::Range& input_scan)
+  void SonarFilter::update(const sensor_msgs::Range& input_scan)
   {
-      //TO DO filter
+   if (checkCorrectSonarDataAndSet(input_scan.range)) {
+      publishSonarData(input_scan);
+    } else {
+      ROS_WARN("Abnormal Sonar data, do nothing but keep monitoring!");
+    }
+      
+    if (getPossibilityOfObstacle() >= POSSIBILITY_MED ){
+      ROS_WARN("Probably meet an obstacle, keep monitoring!");
+    }
   }
 
+  void SonarFilter::publishSonarData(const sensor_msgs::Range& pub)
+  {
+    scan_filtered_pub_.publish(pub);
+  }
   
-private:
-  ros::NodeHandle nh_;
-  tf::TransformListener listener_;
-  std::string base_frame_;
-  ros::Publisher scan_filtered_pub_;
-  ros::Subscriber scan_sub_;
-};
+  bool SonarFilter::checkCorrectSonarDataAndSet(float range)
+  {
+    bool result = false;
+    
+    //must compute the possibility of obstacle _first_
+    setPossibilityOfObstacle(range);
+    
+    if (sonar_dist_tolerance_ > abs(range - last_sonar_data_deprecated_)
+      || (sonar_dist_tolerance_ > abs(range - last_sonar_data_))){
+      result = true;
+      last_sonar_data_ = range;
+      last_sonar_data_deprecated_ = INVALID_SONAR_DATA;
+    } else {
+      last_sonar_data_deprecated_ = range;
+    }
+    
+    return result;
+  }
+  
+  void SonarFilter::setPossibilityOfObstacle(float range)
+  {
+    range < OBSTACLE_DISTANCE_THRESHOLD? possibility_obstacle_ = POSSIBILITY_HIGH :
+      (range < last_sonar_data_? possibility_obstacle_ = POSSIBILITY_MED : possibility_obstacle_ = 
+      POSSIBILITY_LOW);
+  }
+  
+  ObstaclePosibility SonarFilter::getPossibilityOfObstacle()
+  {
+    return possibility_obstacle_;
+  }
+} //namespace
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "sonar_filter");
 
-  SonarFilter filter;
+  intelligent_ca::SonarFilter filter;
   ros::spin();
 }
+
 
