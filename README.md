@@ -1,5 +1,5 @@
 
-#Intelligent Collision Avoidance
+# Intelligent Collision Avoidance
 
 
 This repo is the place holder for enhanced collision avoidance solution based on ROS system (highly 
@@ -9,7 +9,7 @@ sensor, RGB-D camera sensor, etc.) to extends the ability of common navigation b
 - multi-sensor fusion depend on navigation plugin mechanism.
 - different collision avoidance policy, accellerated by deep learning and object tracking.
 
-##Directory Structure
+## Directory Structure
 
 ### <i class="icon-upload"></i> turtlebot_navigation
 This folder holds navigation customization for turtlebot2 robot base, as well our pre-analysis 
@@ -24,19 +24,23 @@ pre-analysis result for POC robot base (say, water base) temporally.
 This folder holds the simple linear filtering algorithm implementation. Currently, the filtering 
 algorithm addresses the noise of sonar input, and filters them out.
 
-##Build Steps
+## Build Steps
 This package was verified under Ubuntu 16.04 with ROS kinectic environment.
-###1. Make sure ROS dependencies and catkin tools ready for use
+
+### 1. Make sure ROS dependencies and catkin tools ready for use
 Follow [ROS Wiki](http://wiki.ros.org/ROS/Installation) and [catkin 
 tool](http://wiki.ros.org/catkin) to download related packages in your Linux machine.
-###2. Download code to your local storage
+
+### 2. Download code to your local storage
     mkdir -p ~/catkin_ws/src
     cd ~/catkin_ws/src
     git clone https://github.intel.com/otc-rse/AMR_ros_collision_avoidance.git
-###3. Build code
+
+### 3. Build code
     cd ~/catkin_ws
     catkin_make
-###4. Sourcing the ROS workspace
+
+### 4. Sourcing the ROS workspace
 After building the workspace, source it via:
     source devel/setup.bash
 
