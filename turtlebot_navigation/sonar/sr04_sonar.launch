@@ -1,0 +1,7 @@
+<launch>
+   <!-- Sonar Rosserial to Main Board -->
+  <arg name="port" default="/dev/ttyACM0"/>
+  <node pkg="rosserial_python" name="serial_node" type="serial_node.py" args="$(arg port)" output="screen" />
+
+  <node pkg="tf" type="static_transform_publisher" name="base_to_sonar" args="0.0 0.0 0.10 0 0.0 0.0 base_link sonar 100"/>
+</launch>
