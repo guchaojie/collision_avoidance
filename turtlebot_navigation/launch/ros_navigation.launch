@@ -3,6 +3,10 @@
   <arg name="laser_type" default="hokuyo" />
   <include file="$(find turtlebot_navigation)/laser/$(arg laser_type)_laser.launch" />
 
+  <!-- Sonar Sensor -->
+  <arg name="sonar_type" default="sr04" />
+  <include file="$(find turtlebot_navigation)/sonar/$(arg sonar_type)_sonar.launch" />
+
   <!-- Map server -->
   <arg name="map_file" default="$(find turtlebot_navigation)/maps/zizhu1-F4-lab-2017-09-06.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
