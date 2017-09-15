@@ -27,6 +27,7 @@
     const int trigPin = 12;
     const int echoPin = 11;
     // defines variables
+    const float pi = 3.14;
     long duration;
     float distance;
     long publisher_timer;
@@ -43,7 +44,6 @@
     
     
     void loop() {
-      if (millis() > publisher_timer) {
          // Clears the trigPin
          digitalWrite(trigPin, LOW);
          delayMicroseconds(2);
@@ -56,34 +56,25 @@
          // Calculating the distance
          distance= duration*0.034/2;
 
-         t.header.frame_id = base_link;
-         t.child_frame_id = sonar;
-         t.transform.translation.x = 1.0; 
-         t.transform.rotation.x = 0.0;
-         t.transform.rotation.y = 0.0; 
-         t.transform.rotation.z = 0.0; 
-         t.transform.rotation.w = 1.0;  
-         t.header.stamp = nh.now();
-         broadcaster.sendTransform(t);
+         if (distance < 400 || distance >= 2) {
+           t.header.frame_id = base_link;
+           t.child_frame_id = sonar;
+           t.transform.rotation.w = 1.0;  
+           t.header.stamp = nh.now();
+           broadcaster.sendTransform(t);
 
-         header.stamp = nh.now();
-         header.frame_id = "/sonar";
-         sonar_msg.header = header;
-         sonar_msg.radiation_type = sonar_msg.ULTRASOUND;
-         sonar_msg.field_of_view = 1;
-         sonar_msg.min_range = 0.02;
-         sonar_msg.max_range = 4;
-         sonar_msg.range = distance/100;
+           header.stamp = nh.now();
+           header.frame_id = "/sonar";
+           sonar_msg.header = header;
+           sonar_msg.radiation_type = sonar_msg.ULTRASOUND;
+           sonar_msg.field_of_view = pi/6;
+           sonar_msg.min_range = 0.02;
+           sonar_msg.max_range = 4;
+           sonar_msg.range = distance/100;
          
-         pub_sonar.publish(&sonar_msg);
-
-         publisher_timer = millis() + 500; //publish once a second
+           pub_sonar.publish(&sonar_msg);
         
       }
 
       nh.spinOnce();
-      
-      // Prints the distance on the Serial Monitor
-  //    Serial.print("Distance: ");
-  //    Serial.println(distance);
     }
