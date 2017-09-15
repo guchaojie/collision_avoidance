@@ -44,7 +44,7 @@ namespace intelligent_ca {
 
   SonarFilter::SonarFilter()
     : nh_("~"), listener_(ros::Duration(10)), 
-    last_sonar_data_(-1.0), sonar_hit_counts_(0),last_sonar_data_deprecated_(-1)
+    last_sonar_data_(INVALID_SONAR_DATA), last_sonar_data_deprecated_(-1)
   {
     scan_filtered_pub_ = nh_.advertise<sensor_msgs::Range>("/sonar_filtered", 1);
     scan_sub_ = nh_.subscribe("/sonar", 1000, &SonarFilter::update, this);
@@ -56,15 +56,17 @@ namespace intelligent_ca {
 
   void SonarFilter::update(const sensor_msgs::Range& input_scan)
   {
-   if (checkCorrectSonarDataAndSet(input_scan.range)) {
+   if (checkCorrectSonarDataAndSet(input_scan)) {
       publishSonarData(input_scan);
     } else {
       ROS_WARN("Abnormal Sonar data, do nothing but keep monitoring!");
     }
-      
+    
+    /**
+     * FIXME: Don't do anything for obstacle possiblity prediction, even if for redundent logging.
     if (getPossibilityOfObstacle() >= POSSIBILITY_MED ){
       ROS_WARN("Probably meet an obstacle, keep monitoring!");
-    }
+    }*/
   }
 
   void SonarFilter::publishSonarData(const sensor_msgs::Range& pub)
@@ -72,11 +74,17 @@ namespace intelligent_ca {
     scan_filtered_pub_.publish(pub);
   }
   
-  bool SonarFilter::checkCorrectSonarDataAndSet(float range)
+  bool SonarFilter::checkCorrectSonarDataAndSet(const sensor_msgs::Range& data)
   {
-    bool result = false;
     
-    //must compute the possibility of obstacle _first_
+    ///1. Check if sonar data in the corrent range
+    if (data.range < data.min_range || data.range > data.max_range){
+      return false;
+    }
+    
+    bool result = false;
+    ///2. must compute the possibility of obstacle
+    //FIXME: Possibility of obstacle is only used for algorithm selection
     setPossibilityOfObstacle(range);
     
     if (sonar_dist_tolerance_ > abs(range - last_sonar_data_deprecated_)

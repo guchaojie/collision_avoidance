@@ -48,7 +48,7 @@ namespace intelligent_ca {
     POSSIBILITY_HIGH
   };
   
-  const float INVALID_SONAR_DATA = -1.0;
+  const float INVALID_SONAR_DATA = -1000.0;
   
   ///@brief distance threshold of the distance. Unit:meter.
   const float OBSTACLE_DISTANCE_THRESHOLD = 0.25;
@@ -60,7 +60,7 @@ public:
   void update(const sensor_msgs::Range& input_scan);
   
 private:
-  bool checkCorrectSonarDataAndSet(float range);
+  bool checkCorrectSonarDataAndSet(const sensor_msgs::Range& data);
   void publishSonarData(const sensor_msgs::Range& pub);
   void setPossibilityOfObstacle(float range);
   ObstaclePosibility getPossibilityOfObstacle();
@@ -81,7 +81,7 @@ private:
    l ast correct data.      *
    */
   float last_sonar_data_deprecated_;
-  int sonar_hit_counts_;
+  
   float sonar_dist_tolerance_;
   ObstaclePosibility possibility_obstacle_;
 };
