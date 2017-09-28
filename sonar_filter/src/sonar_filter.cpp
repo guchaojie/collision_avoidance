@@ -83,10 +83,11 @@ namespace intelligent_ca {
     }
     
     bool result = false;
+    float range = data.range;
     ///2. must compute the possibility of obstacle
     //FIXME: Possibility of obstacle is only used for algorithm selection
     setPossibilityOfObstacle(range);
-    
+    getPossibilityOfObstacle();
     if (sonar_dist_tolerance_ > abs(range - last_sonar_data_deprecated_)
       || (sonar_dist_tolerance_ > abs(range - last_sonar_data_))){
       result = true;
@@ -111,7 +112,6 @@ namespace intelligent_ca {
     return possibility_obstacle_;
   }
 } //namespace
-
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "sonar_filter");
