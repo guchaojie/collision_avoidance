@@ -75,7 +75,7 @@ namespace intelligent_ca {
       
   }
   
-  void Obstacles::publish(const CaObjectFrame* frame)
+  void Obstacles::publish(std::shared_ptr<CaObjectFrame>& frame)
   {
     calcVelocity();
     frame->publish();

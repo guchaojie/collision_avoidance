@@ -76,8 +76,8 @@ msg.header.frame_id);
     
     frame->addVector(msg.objects_vector);
     
-    publish(frames_, frame);
-    frames_.clearOldFrames();
+    frames_->publish(frame);
+    frames_->clearOldFrames();
    
   }
   
@@ -87,8 +87,8 @@ msg.header.frame_id);
 msg.header.frame_id);
     
     frame->addVector(msg.tracked_objects);
-    frames_.publish(frame);
-    frames_.clearOldFrames();
+    frames_->publish(frame);
+    frames_->clearOldFrames();
     
   }
   
@@ -98,8 +98,8 @@ msg.header.frame_id);
 msg.header.frame_id);
     
     frame->addVector(msg.objects_in_boxes);
-    frames_.publish(frame);
-    frames_.clearOldFrames();
+    frames_->publish(frame);
+    frames_->clearOldFrames();
   }
   
  

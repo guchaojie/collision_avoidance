@@ -38,7 +38,8 @@
 #define ICA_CA_OBJECT_FRAME_H_
 
 namespace intelligent_ca {
-
+  
+  
 /** @brief This class merges topics from object pipeline component, and publish the merged topics.
  * This class stores and manages the objects tracked in one camera frame.
  */
@@ -54,7 +55,7 @@ public:
   void addVector(const DetectionVector& vector);
   void addVector(const TrackingVector& vector);
   void addVector(const LocalizationVector& vector);
-  bool publish() const;///@brief Publish messages with merged object topics
+  bool publish();///@brief Publish messages with merged object topics
   bool isDataReady() { return !objects_detected_.empty() && !objects_tracked_.empty() && 
 !objects_localized_.empty();};
   std::string getTfFrameId(){ return tf_frame_id_;};
@@ -64,6 +65,9 @@ public:
 
 private:
   void publishObjectsInGroup();
+  bool findTrackingObjectByRoi(const ObjectRoi& roi, TrackingObjectInBox& track);
+  bool findLocalizationObjectByRoi(const ObjectRoi& roi, LocalizationObjectInBox& loc);
+  void setFlagPublished(bool state);
   //ObjectVector objests;
   std::string tf_frame_id_;
   ros::Time stamp_;

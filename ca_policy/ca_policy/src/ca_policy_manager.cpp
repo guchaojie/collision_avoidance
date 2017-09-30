@@ -47,7 +47,7 @@ namespace intelligent_ca {
   CaPolicyManager::CaPolicyManager()
   {
     policies_.clear();
-    current_policy_ = nullptr;
+    
   }
 
   CaPolicyManager::~CaPolicyManager()
@@ -57,9 +57,10 @@ namespace intelligent_ca {
   bool CaPolicyManager::addPolicy(const std::string name, const CaPolicy& policy)
   {
     try{
-      CaPolicyVector::iterator found = findPolicy(name);
+      CaPolicyVector::iterator exist;
+      bool found= findPolicy(name, exist);
       if(found){
-        std::get<1>(*found) = policy;
+        std::get<1>(*exist) = policy;
         return true;
       }
       
@@ -75,9 +76,10 @@ namespace intelligent_ca {
   bool CaPolicyManager::deletePolicy(const std::string name)
   {
     try{
-      CaPolicyVector::iterator found = findPolicy(name);
+      CaPolicyVector::iterator exist;
+      bool found = findPolicy(name, exist);
       if (found){
-        policies_.erase(*found);    
+        policies_.erase(exist);    
       }
       return true;
     }catch (...){
@@ -86,30 +88,36 @@ namespace intelligent_ca {
     }
   }
   
-  CaPolicyVector::iterator CaPolicyManager::findPolicy(const std::string name)
+  bool CaPolicyManager::findPolicy(const std::string name, CaPolicyVector::iterator& pair)
   {
-    for (CaPolicyVector::interator it = policies_.begin(); it != policies_.end(); ++it){
+    for (CaPolicyVector::iterator it = policies_.begin(); it != policies_.end(); ++it){
       if (name == std::get<0> (*it)){
-        return it;
+        pair = it;
+        return true;
       }
     }
     
-    return nullptr;
+    return false;
   }
   
    
   bool CaPolicyManager::setCurrentPolicy(const std::string name)
   {
     try{
-      CaPolicyVector::iterator found = findPolicy(name);
-      if(found != nullptr)
-      current_policy_ = found;
+      CaPolicyVector::iterator exist;
+      bool found = findPolicy(name, exist);
+      if(found){
+        current_policy_ = *exist;
       
       
-      ///TODO: talk with Navigation stack here
+        ///TODO: talk with Navigation stack here
       
       
-      return true;
+        return true;
+      } else {
+        ROS_WARN("No policy named %s", name.c_str());
+        return false;
+      }
     }catch(...){
       ROS_ERROR("Error when set current Policy");
       return false;

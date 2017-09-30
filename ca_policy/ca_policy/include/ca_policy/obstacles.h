@@ -35,8 +35,8 @@
 
 #include "object_frame.h"
 
-#ifndef ICA_CA_OBSTACLES_H_
-#define ICA_CA_OBSTACLES_H_
+#ifndef ICA_CA_OBSTACLES_H
+#define ICA_CA_OBSTACLES_H
 
 namespace intelligent_ca {
 
@@ -54,7 +54,7 @@ frame_out);
   //std::vector<CaObjectFrame> getAllFrames();
   //virtual geometry_msgs::Point32 getObstacleCenterPos();
   bool calcVelocity(void);
-  void publish(const CaObjectFrame* frame);
+  void publish(std::shared_ptr<CaObjectFrame>& frame);
   void clearOldFrames();
   
 private:

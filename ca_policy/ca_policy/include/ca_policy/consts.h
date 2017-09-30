@@ -65,6 +65,8 @@ namespace intelligent_ca {
   using ObjectMergedVector = std::vector<MergedObject>;
   using ObjectMergedMsg = object_bridge_msgs::ObjectsInFrameMerged;
   
+  using ObjectRoi = sensor_msgs::RegionOfInterest;
+  
   const std::string kTopicObjectDetection = "/todo"; //TODO
   const std::string kTopicObjectTracking = "/todo"; //TODO
   const std::string kTopicObjectLocalization = "/result_3d"; //TODO

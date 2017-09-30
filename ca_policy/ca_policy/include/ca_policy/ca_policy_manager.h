@@ -55,9 +55,9 @@ public:
   bool setCurrentPolicy(const std::string name);
   
 private:
-  CaPolicyVector::iterator findPolicy(const std::string name);
+  bool findPolicy(const std::string name, CaPolicyVector::iterator& pair);
   CaPolicyVector policies_;
-  std::shared_ptr<CaPolicyPair> current_policy_;
+  CaPolicyPair current_policy_;
 
 };
 

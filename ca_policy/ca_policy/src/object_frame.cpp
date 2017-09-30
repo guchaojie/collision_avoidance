@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <object_bridge_msgs/ObjectMerged.h>
 #include <ca_policy/ca_policy.h>
 #include <ca_policy/object_frame.h>
+#include <sensor_msgs/RegionOfInterest.h>
 
 namespace intelligent_ca {
 
@@ -96,7 +97,7 @@ namespace intelligent_ca {
       //ROS_WARN("Already published or data not ready. Do nothing");
       return;
     }
-    using ObjectRoi = sensor_msgs::RangeOfInterest;
+    
     for (DetectionVector::iterator it=objects_detected_.begin(); it != objects_detected_.end(); 
       ++it){
       
@@ -115,7 +116,7 @@ namespace intelligent_ca {
           merged_obj.id = track_obj.id;
           merged_obj.type = it->object.object_name;
           merged_obj.probability = it->object.probability;
-          merged_obj.roi = it->object.roi;
+          merged_obj.roi = it->roi;
         
           objects_merged_.push_back(merged_obj);
         }
@@ -125,7 +126,34 @@ namespace intelligent_ca {
     
   }
   
-  bool CaObjectFrame::publish() const
+  bool CaObjectFrame::findTrackingObjectByRoi(const ObjectRoi& roi, TrackingObjectInBox& track)
+  {
+    for (auto t : objects_tracked_) {
+      if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset &&
+        roi.width == t.roi.width && roi.height == t.roi.height){
+        track = t;
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  bool CaObjectFrame::findLocalizationObjectByRoi(const ObjectRoi& roi, LocalizationObjectInBox& 
+loc)
+  {
+    for (auto t : objects_localized_) {
+      if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset &&
+        roi.width == t.roi.width && roi.height == t.roi.height){
+        loc = t;
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  bool CaObjectFrame::publish()
   {
     if(published_)
     {
@@ -136,12 +164,12 @@ namespace intelligent_ca {
     try{
       if( !objects_merged_.empty() ){
         ObjectMergedMsg msg;
-        msg.header.frame_id = tf_freame_id;
+        msg.header.frame_id = tf_frame_id_;
         msg.header.stamp = stamp_;
-        msg.objects = merged_vector;
+        msg.objects = objects_merged_;
         objects_pub_.publish(msg);
         
-        published_ = true;
+        setFlagPublished(true);
         return true;
       }
     } catch (...) {
@@ -150,5 +178,10 @@ namespace intelligent_ca {
     }
     
     return false;
+  }
+  
+  void CaObjectFrame::setFlagPublished(bool state)
+  {
+    published_ = state;
   }
 } //namespace
