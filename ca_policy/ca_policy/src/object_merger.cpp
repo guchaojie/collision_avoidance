@@ -1,6 +1,7 @@
 
-/******************************************************************************  *
-Copyright (c) 2017, Intel Corporation                                           *
+/******************************************************************************
+*
+Copyright (c) 2017, Intel Corporation *
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,81 +30,67 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
-#include <vector>
 #include <boost/thread/thread.hpp>
+#include <vector>
 
+#include "ca_policy/ca_policy.h"
+#include "ca_policy/object_merger.h"
+#include "object_bridge_msgs/ObjectMerged.h"
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
-#include <object_bridge_msgs/ObjectMerged.h> 
-#include <ca_policy/ca_policy.h>
-#include <ca_policy/object_merger.h>
 
-namespace intelligent_ca {
+namespace intelligent_ca
+{
+ObjectMerger::ObjectMerger() : nh_("~")
+{
+  detection_sub_ = nh_.subscribe(kTopicObjectDetection, 10, &ObjectMerger::onObjectDetected, this);
+  tracking_sub_ = nh_.subscribe(kTopicObjectDetection, 10, &ObjectMerger::onObjectTracked, this);
+  localization_sub_ = nh_.subscribe(kTopicObjectLocalization, 10, &ObjectMerger::onObjectLocalized, this);
 
+  /// We assume the maximum object detected in one camera frame is less than 10
+  /// We just store at most 2 frames of topics
+  // objects_detected_.reserve(10*2);
+  // objects_tracked_.reserve(10*2);
+  // objects_localized_.reserve(10*2);
 
-  ObjectMerger::ObjectMerger()
-  : nh_("~")
-  {
-    detection_sub_ = nh_.subscribe(kTopicObjectDetection, 10, &ObjectMerger::onObjectDetected, 
-this);
-    tracking_sub_ = nh_.subscribe(kTopicObjectDetection, 10, &ObjectMerger::onObjectTracked, this);
-    localization_sub_ = nh_.subscribe(kTopicObjectLocalization, 10, 
-&ObjectMerger::onObjectLocalized, this);
-    
-    ///We assume the maximum object detected in one camera frame is less than 10
-    ///We just store at most 2 frames of topics
-    //objects_detected_.reserve(10*2);
-    //objects_tracked_.reserve(10*2);
-    //objects_localized_.reserve(10*2);
+  // nh_.param<std::string>("base_frame", base_frame_, "/base_link");
 
-    //nh_.param<std::string>("base_frame", base_frame_, "/base_link");
-    
-    //ros::ServiceServer service = nh_.advertiseService("obj_merger",&CaPolicy::mergeObjects);
-    
-    frames_ = std::make_shared<Obstacles>(nh_);
-    
-  }
-  
-  ObjectMerger::~ObjectMerger()
-  {
+  // ros::ServiceServer service =
+  // nh_.advertiseService("obj_merger",&CaPolicy::mergeObjects);
 
-  }
-  
-  void ObjectMerger::onObjectDetected(const DetectionMsg msg)
-  {
-    std::shared_ptr<CaObjectFrame> frame = frames_->getInstance(msg.header.stamp, 
-msg.header.frame_id);
-    
-    frame->addVector(msg.objects_vector);
-    
-    frames_->publish(frame);
-    frames_->clearOldFrames();
-   
-  }
-  
-  void ObjectMerger::onObjectTracked(const TrackingMsg msg)
-  {
-    std::shared_ptr<CaObjectFrame> frame = frames_->getInstance(msg.header.stamp, 
-msg.header.frame_id);
-    
-    frame->addVector(msg.tracked_objects);
-    frames_->publish(frame);
-    frames_->clearOldFrames();
-    
-  }
-  
-  void ObjectMerger::onObjectLocalized(const LocalizationMsg msg)
-  {
-    std::shared_ptr<CaObjectFrame> frame = frames_->getInstance(msg.header.stamp, 
-msg.header.frame_id);
-    
-    frame->addVector(msg.objects_in_boxes);
-    frames_->publish(frame);
-    frames_->clearOldFrames();
-  }
-  
- 
+  frames_ = std::make_shared<Obstacles>(nh_);
+}
 
-} //namespace
+ObjectMerger::~ObjectMerger()
+{
+}
 
+void ObjectMerger::onObjectDetected(const ros_yolo_msgs::ObjectsInBoxesConstPtr& msg)
+{
+  std::shared_ptr<CaObjectFrame> frame = frames_->getInstance(msg->header.stamp, msg->header.frame_id);
 
+  frame->addVector(msg->objects_vector);
+
+  frames_->publish(frame);
+  frames_->clearOldFrames();
+}
+
+void ObjectMerger::onObjectTracked(const object_pipeline_msgs::TrackedObjectsConstPtr& msg)
+{
+  std::shared_ptr<CaObjectFrame> frame = frames_->getInstance(msg->header.stamp, msg->header.frame_id);
+
+  frame->addVector(msg->tracked_objects);
+  frames_->publish(frame);
+  frames_->clearOldFrames();
+}
+
+void ObjectMerger::onObjectLocalized(const object_pipeline_msgs::ObjectsInBoxes3DConstPtr& msg)
+{
+  std::shared_ptr<CaObjectFrame> frame = frames_->getInstance(msg->header.stamp, msg->header.frame_id);
+
+  frame->addVector(msg->objects_in_boxes);
+  frames_->publish(frame);
+  frames_->clearOldFrames();
+}
+
+}  // namespace

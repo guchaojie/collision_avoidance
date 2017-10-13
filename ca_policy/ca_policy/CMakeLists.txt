@@ -4,11 +4,15 @@ project(ca_policy)
 add_definitions(-std=c++11)
 
 # Load catkin and all dependencies required for this package
-find_package(catkin REQUIRED COMPONENTS tf roscpp ca_policy_msgs)
+find_package(catkin REQUIRED COMPONENTS tf roscpp std_msgs
+		object_pipeline_msgs
+		object_bridge_msgs
+		ros_yolo_msgs
+		ca_policy_msgs)
 
 # What other packages will need to use this package
 catkin_package(
-    CATKIN_DEPENDS tf roscpp sensor_msgs
+    CATKIN_DEPENDS tf roscpp sensor_msgs std_msgs
 )
 
 
@@ -18,7 +22,7 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 # Add_executables
-add_executable(ca_policy 
+add_executable(ca_policy
   src/object_merger_node.cpp
   src/ca_policy.cpp
   src/ca_policy_manager.cpp

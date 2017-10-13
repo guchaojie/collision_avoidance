@@ -1,6 +1,7 @@
 
-/******************************************************************************  *
-Copyright (c) 2017, Intel Corporation                                           *
+/******************************************************************************
+*
+Copyright (c) 2017, Intel Corporation *
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,104 +30,104 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
-#include <vector>
 #include <boost/thread/thread.hpp>
+#include <vector>
 
 #include <math.h>
 #include <ros/ros.h>
 //#include <ca_policy_msgs/People.h>
-#include <ca_policy/obstacles.h>
+#include "ca_policy/obstacles.h"
+#include "object_bridge_msgs/ObjectMerged.h"
 
-#include <object_bridge_msgs/ObjectMerged.h> ///TODO: name to be defined
+namespace intelligent_ca
+{
+Obstacles::Obstacles(ros::NodeHandle nh) : nh_(nh)
+{
+  frames_.clear();
+  max_frames_ = 10;  ///@todo, Set the max number of frames in memory with parameter system.
+}
 
+Obstacles::Obstacles() : nh_("~")
+{
+  frames_.clear();
+  max_frames_ = 10;  ///@todo, Set the max number of frames in memory with parameter system.
+}
 
-namespace intelligent_ca {
+Obstacles::~Obstacles()
+{
+}
 
+bool Obstacles::calcVelocity(void)
+{
+  /// TODO:
 
-  Obstacles::Obstacles(ros::NodeHandle nh)
-  :nh_(nh)
+  return true;
+}
+
+void Obstacles::clearOldFrames()
+{
+  int olds = frames_.size() - max_frames_;
+
+  if (olds > 0)
   {
-    frames_.clear();
+    frames_.erase(frames_.begin(), frames_.begin() + olds);
   }
-  
-  Obstacles::Obstacles()
-  :nh_("~")
-  {
-    frames_.clear();
-  }
-  
-  Obstacles::~Obstacles()
-  {
+}
 
-  }
-  
-  bool Obstacles::calcVelocity(void)
+void Obstacles::publish(std::shared_ptr<CaObjectFrame>& frame)
+{
+  calcVelocity();
+  frame->publish();
+}
+
+std::shared_ptr<CaObjectFrame> Obstacles::getInstance(ros::Time stamp, std::string frame_id)
+{
+  std::shared_ptr<CaObjectFrame> frame_out = nullptr;
+  try
   {
-    ///TODO:
-  }
-  
-  void Obstacles::clearOldFrames()
-  {
-    int olds = frames_.size() - max_frames_;
-    
-    if(olds > 0){
-      frames_.erase(frames_.begin(), frames_.begin()+olds);
+    bool result = findObjectFrame(stamp, frame_id, frame_out);
+    if (!result)
+    {
+      frame_out = std::make_shared<CaObjectFrame>(nh_);
+      frames_.push_back(*frame_out);
     }
-      
   }
-  
-  void Obstacles::publish(std::shared_ptr<CaObjectFrame>& frame)
+  catch (...)
   {
-    calcVelocity();
-    frame->publish();
-  }
-  
-  std::shared_ptr<CaObjectFrame> Obstacles::getInstance(ros::Time stamp, std::string frame_id)
-  {
-    std::shared_ptr<CaObjectFrame> frame_out = nullptr;
-    try{
-      bool result = findObjectFrame(stamp, frame_id, frame_out);
-      if (!result){
-        frame_out = std::make_shared<CaObjectFrame>(nh_);
-        frames_.push_back(*frame_out);
-      }
-    } catch (...){
-      ROS_ERROR("Failed when getInstance from Obstacles");
-      return nullptr;
-    }
-    
-    return frame_out;
+    ROS_ERROR("Failed when getInstance from Obstacles");
+    return nullptr;
   }
 
-  bool Obstacles::findObjectFrame(ros::Time stamp, std::string frame_id, 
-std::shared_ptr<CaObjectFrame> frame_out)
+  return frame_out;
+}
+
+bool Obstacles::findObjectFrame(ros::Time stamp, std::string frame_id, std::shared_ptr<CaObjectFrame> frame_out)
+{
+  bool ret = false;
+
+  for (std::vector<CaObjectFrame>::iterator it = frames_.begin(); it != frames_.end(); ++it)
   {
-    bool ret = false;
-    
-    for (std::vector<CaObjectFrame>::iterator it = frames_.begin(); it != frames_.end(); ++it){
-      if (it->getTfFrameId() == frame_id && it->getStamp() == stamp){
-        frame_out = std::shared_ptr<CaObjectFrame>(&(*it));
-        ret = true;
-        break;
-      }
-    }
-    
-    return ret;
-  }
-  
-  bool Obstacles::addObjectFrame(const CaObjectFrame*& frame)
-  {
-    bool ret = false;
-    
-    if (frame != nullptr){
-      frames_.push_back(*frame);
+    if (it->getTfFrameId() == frame_id && it->getStamp() == stamp)
+    {
+      frame_out = std::shared_ptr<CaObjectFrame>(&(*it));
       ret = true;
+      break;
     }
-    
-    return ret;
   }
-} //namespace
 
+  return ret;
+}
 
+bool Obstacles::addObjectFrame(const CaObjectFrame*& frame)
+{
+  bool ret = false;
 
+  if (frame != nullptr)
+  {
+    frames_.push_back(*frame);
+    ret = true;
+  }
 
+  return ret;
+}
+}  // namespace

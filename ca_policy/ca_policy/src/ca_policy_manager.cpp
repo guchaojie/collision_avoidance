@@ -1,6 +1,7 @@
 
-/******************************************************************************  *
-Copyright (c) 2017, Intel Corporation                                           *
+/******************************************************************************
+*
+Copyright (c) 2017, Intel Corporation *
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,102 +30,110 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
-#include <vector>
 #include <boost/thread/thread.hpp>
+#include <vector>
 
-#include <math.h>
+//#include <math.h>
 #include <ros/ros.h>
 //#include <ca_policy_msgs/People.h>
+#include "ca_policy/ca_policy.h"
+#include "ca_policy/ca_policy_manager.h"
+#include "ca_policy/consts.h"
+#include "object_bridge_msgs/ObjectMerged.h"
 #include <tf/transform_listener.h>
-#include <object_bridge_msgs/ObjectMerged.h>
-#include <ca_policy/ca_policy.h>
-#include <ca_policy/consts.h>
-#include <ca_policy/ca_policy_manager.h>
 
-namespace intelligent_ca {
+namespace intelligent_ca
+{
+CaPolicyManager::CaPolicyManager()
+{
+  policies_.clear();
+}
 
+CaPolicyManager::~CaPolicyManager()
+{
+}
 
-  CaPolicyManager::CaPolicyManager()
+bool CaPolicyManager::addPolicy(const std::string name, const CaPolicy& policy)
+{
+  try
   {
-    policies_.clear();
-    
-  }
-
-  CaPolicyManager::~CaPolicyManager()
-  {
-  }
-  
-  bool CaPolicyManager::addPolicy(const std::string name, const CaPolicy& policy)
-  {
-    try{
-      CaPolicyVector::iterator exist;
-      bool found= findPolicy(name, exist);
-      if(found){
-        std::get<1>(*exist) = policy;
-        return true;
-      }
-      
-      CaPolicyPair pair = std::make_pair(name, policy);
-      policies_.push_back(pair);
+    CaPolicyVector::iterator exist;
+    bool found = findPolicy(name, exist);
+    if (found)
+    {
+      std::get<1>(*exist) = policy;
       return true;
-    }catch (...){
-      ROS_ERROR("Error when add policy...");
-      return false;
     }
-  }
 
-  bool CaPolicyManager::deletePolicy(const std::string name)
-  {
-    try{
-      CaPolicyVector::iterator exist;
-      bool found = findPolicy(name, exist);
-      if (found){
-        policies_.erase(exist);    
-      }
-      return true;
-    }catch (...){
-      ROS_ERROR("Error when add policy...");
-      return false;
-    }
+    CaPolicyPair pair = std::make_pair(name, policy);
+    policies_.push_back(pair);
+    return true;
   }
-  
-  bool CaPolicyManager::findPolicy(const std::string name, CaPolicyVector::iterator& pair)
+  catch (...)
   {
-    for (CaPolicyVector::iterator it = policies_.begin(); it != policies_.end(); ++it){
-      if (name == std::get<0> (*it)){
-        pair = it;
-        return true;
-      }
-    }
-    
+    ROS_ERROR("Error when add policy...");
     return false;
   }
-  
-   
-  bool CaPolicyManager::setCurrentPolicy(const std::string name)
+}
+
+bool CaPolicyManager::deletePolicy(const std::string name)
+{
+  try
   {
-    try{
-      CaPolicyVector::iterator exist;
-      bool found = findPolicy(name, exist);
-      if(found){
-        current_policy_ = *exist;
-      
-      
-        ///TODO: talk with Navigation stack here
-      
-      
-        return true;
-      } else {
-        ROS_WARN("No policy named %s", name.c_str());
-        return false;
-      }
-    }catch(...){
-      ROS_ERROR("Error when set current Policy");
-      return false;
+    CaPolicyVector::iterator exist;
+    bool found = findPolicy(name, exist);
+    if (found)
+    {
+      policies_.erase(exist);
     }
-   
+    return true;
+  }
+  catch (...)
+  {
+    ROS_ERROR("Error when add policy...");
+    return false;
+  }
+}
+
+bool CaPolicyManager::findPolicy(const std::string name, CaPolicyVector::iterator& pair)
+{
+  for (CaPolicyVector::iterator it = policies_.begin(); it != policies_.end(); ++it)
+  {
+    if (name == std::get<0>(*it))
+    {
+      pair = it;
+      return true;
+    }
   }
 
-} //namespace
+  return false;
+}
 
+bool CaPolicyManager::setCurrentPolicy(const std::string name)
+{
+  try
+  {
+    CaPolicyVector::iterator exist;
+    bool found = findPolicy(name, exist);
+    if (found)
+    {
+      current_policy_ = *exist;
 
+      /// TODO: talk with Navigation stack here
+
+      return true;
+    }
+    else
+    {
+      ROS_WARN("No policy named %s", name.c_str());
+      return false;
+    }
+  }
+  catch (...)
+  {
+    ROS_ERROR("Error when set current Policy");
+    return false;
+  }
+}
+
+}  // namespace

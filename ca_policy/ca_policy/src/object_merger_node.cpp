@@ -1,6 +1,7 @@
 
-/******************************************************************************  *
-Copyright (c) 2017, Intel Corporation                                           *
+/******************************************************************************
+*
+Copyright (c) 2017, Intel Corporation *
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,11 +30,9 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
-
+#include "ca_policy/ca_policy.h"
+#include "ca_policy/object_merger.h"
 #include <ros/ros.h>
-#include <ca_policy/object_merger.h>
-#include <ca_policy/ca_policy.h>
-
 
 using namespace intelligent_ca;
 
@@ -41,8 +40,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "object_merger");
 
-  ObjectMerger merger;;
+  ObjectMerger merger;
+  ;
   ros::spin();
 }
-
-

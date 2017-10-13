@@ -1,21 +1,21 @@
 /******************************************************************************
- Copyright (c) 2017, Intel Corporation                                           *
+ Copyright (c) 2017, Intel Corporation *
  All rights reserved.
- 
+
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
- 
+
  1. Redistributions of source code must retain the above copyright notice, this
  list of conditions and the following disclaimer.
- 
+
  2. Redistributions in binary form must reproduce the above copyright notice,
  this list of conditions and the following disclaimer in the documentation
  and/or other materials provided with the distribution.
- 
+
  3. Neither the name of the copyright holder nor the names of its contributors
  may be used to endorse or promote products derived from this software without
  specific prior written permission.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,19 +28,18 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-#include <vector>
-#include <math.h>
+#ifndef ICA_CA_OBJECT_FRAME_H
+#define ICA_CA_OBJECT_FRAME_H
+
 #include <ros/ros.h>
+#include <vector>
 
-#include <ca_policy/consts.h>
+#include "ca_policy/consts.h"
 
-#ifndef ICA_CA_OBJECT_FRAME_H_
-#define ICA_CA_OBJECT_FRAME_H_
-
-namespace intelligent_ca {
-  
-  
-/** @brief This class merges topics from object pipeline component, and publish the merged topics.
+namespace intelligent_ca
+{
+/** @brief This class merges topics from object pipeline component, and publish
+ * the merged topics.
  * This class stores and manages the objects tracked in one camera frame.
  */
 class CaObjectFrame
@@ -48,41 +47,46 @@ class CaObjectFrame
 public:
   CaObjectFrame();
   CaObjectFrame(ros::NodeHandle nh);
-  //CaObjectFrame(ObjectVector& vector);
   virtual ~CaObjectFrame();
-  
-  //init(ObjectVector& vector);
+
+  // init(ObjectVector& vector);
+
   void addVector(const DetectionVector& vector);
   void addVector(const TrackingVector& vector);
   void addVector(const LocalizationVector& vector);
-  bool publish();///@brief Publish messages with merged object topics
-  bool isDataReady() { return !objects_detected_.empty() && !objects_tracked_.empty() && 
-!objects_localized_.empty();};
-  std::string getTfFrameId(){ return tf_frame_id_;};
-  ros::Time getStamp() {return stamp_;};
+  bool publish();  ///@brief Publish messages with merged object topics
+  bool isDataReady()
+  {
+    return !objects_detected_.empty() && !objects_tracked_.empty() && !objects_localized_.empty();
+  };
+  std::string getTfFrameId()
+  {
+    return tf_frame_id_;
+  };
+  ros::Time getStamp()
+  {
+    return stamp_;
+  };
   void mergeObjects();
-
 
 private:
   void publishObjectsInGroup();
   bool findTrackingObjectByRoi(const ObjectRoi& roi, TrackingObjectInBox& track);
   bool findLocalizationObjectByRoi(const ObjectRoi& roi, LocalizationObjectInBox& loc);
   void setFlagPublished(bool state);
-  //ObjectVector objests;
+  // ObjectVector objests;
   std::string tf_frame_id_;
   ros::Time stamp_;
   ros::NodeHandle nh_;
-  
+
   DetectionVector objects_detected_;
   TrackingVector objects_tracked_;
   LocalizationVector objects_localized_;
-  
+
   ros::Publisher objects_pub_;
   ObjectMergedVector objects_merged_;
   bool published_;
- 
 };
 
-
-} //namespace
+}  // namespace
 #endif

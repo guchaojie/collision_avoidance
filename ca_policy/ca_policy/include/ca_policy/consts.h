@@ -1,21 +1,21 @@
 /******************************************************************************
- Copyright (c) 2017, Intel Corporation                                           *
+ Copyright (c) 2017, Intel Corporation *
  All rights reserved.
- 
+
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
- 
+
  1. Redistributions of source code must retain the above copyright notice, this
  list of conditions and the following disclaimer.
- 
+
  2. Redistributions in binary form must reproduce the above copyright notice,
  this list of conditions and the following disclaimer in the documentation
  and/or other materials provided with the distribution.
- 
+
  3. Neither the name of the copyright holder nor the names of its contributors
  may be used to endorse or promote products derived from this software without
  specific prior written permission.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,52 +28,51 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-#include <vector>
-#include <math.h>
+#ifndef ICA_CONSTS_H
+#define ICA_CONSTS_H
+
 #include <ros/ros.h>
+#include <vector>
 //#include <sensor_msgs/people.h>
-#include <tf/transform_listener.h>
+#include <object_pipeline_msgs/ObjectInBox3D.h>
+#include <object_pipeline_msgs/ObjectsInBoxes3D.h>
+#include <object_pipeline_msgs/TrackedObject.h>
+#include <object_pipeline_msgs/TrackedObjects.h>
 #include <ros_yolo_msgs/Object.h>
 #include <ros_yolo_msgs/ObjectInBox.h>
 #include <ros_yolo_msgs/ObjectsInBoxes.h>
-#include <object_pipeline_msgs/TrackedObject.h>
-#include <object_pipeline_msgs/ObjectInBox3D.h>
-#include <object_pipeline_msgs/TrackedObjects.h>
-#include <object_pipeline_msgs/ObjectsInBoxes3D.h>
 
-#include <object_bridge_msgs/ObjectMerged.h>
-#include <object_bridge_msgs/ObjectsInFrameMerged.h>
+#include "object_bridge_msgs/ObjectMerged.h"
+#include "object_bridge_msgs/ObjectsInFrameMerged.h"
 
-#ifndef ICA_CONSTS_H_
-#define ICA_CONSTS_H_
+namespace intelligent_ca
+{
+using DetectionObject = ros_yolo_msgs::Object;
+using DetectionObjectInBox = ros_yolo_msgs::ObjectInBox;
+using TrackingObjectInBox = object_pipeline_msgs::TrackedObject;
+using LocalizationObjectInBox = object_pipeline_msgs::ObjectInBox3D;
 
-namespace intelligent_ca {
-  using DetectionObject = ros_yolo_msgs::Object;
-  using DetectionObjectInBox = ros_yolo_msgs::ObjectInBox;
-  using TrackingObjectInBox = object_pipeline_msgs::TrackedObject;
-  using LocalizationObjectInBox = object_pipeline_msgs::ObjectInBox3D;
-  
-  using DetectionMsg = ros_yolo_msgs::ObjectsInBoxes;
-  using TrackingMsg = object_pipeline_msgs::TrackedObjects;
-  using LocalizationMsg = object_pipeline_msgs::ObjectsInBoxes3D;
-  
-  using DetectionVector = std::vector<DetectionObjectInBox>;
-  using TrackingVector = std::vector<TrackingObjectInBox>; 
-  using LocalizationVector = std::vector<LocalizationObjectInBox>;
-  
-  using MergedObject = object_bridge_msgs::ObjectMerged;
-  using ObjectMergedVector = std::vector<MergedObject>;
-  using ObjectMergedMsg = object_bridge_msgs::ObjectsInFrameMerged;
-  
-  using ObjectRoi = sensor_msgs::RegionOfInterest;
-  
-  const std::string kTopicObjectDetection = "/todo"; //TODO
-  const std::string kTopicObjectTracking = "/todo"; //TODO
-  const std::string kTopicObjectLocalization = "/result_3d"; //TODO
+using DetectionMsg = ros_yolo_msgs::ObjectsInBoxes;
+using TrackingMsg = object_pipeline_msgs::TrackedObjects;
+using LocalizationMsg = object_pipeline_msgs::ObjectsInBoxes3D;
 
-  const std::string kTopicCaPolicy = "/ca_policy";
-  const std::string kTopicObjectsInFrame = "/object_merged";
+using DetectionVector = std::vector<DetectionObjectInBox>;
+using TrackingVector = std::vector<TrackingObjectInBox>;
+using LocalizationVector = std::vector<LocalizationObjectInBox>;
 
+using MergedObject = object_bridge_msgs::ObjectMerged;
+using ObjectMergedVector = std::vector<MergedObject>;
+using ObjectMergedMsg = object_bridge_msgs::ObjectsInFrameMerged;
 
-} //namespace
+using ObjectRoi = sensor_msgs::RegionOfInterest;
+
+constexpr char* kTopicObjectDetection = "/todo";  // TODO
+// const std::string kTopicObjectDetection = "/todo";          // TODO
+constexpr char* kTopicObjectTracking = "/todo";           // TODO
+constexpr char* kTopicObjectLocalization = "/result_3d";  // TODO
+
+constexpr char* kTopicCaPolicy = "/ca_policy";
+constexpr char* kTopicObjectsInFrame = "/object_merged";
+
+}  // namespace
 #endif
