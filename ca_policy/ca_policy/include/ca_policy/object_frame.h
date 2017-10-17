@@ -51,41 +51,98 @@ public:
 
   // init(ObjectVector& vector);
 
+  /** @brief add detection vector (got from object pipeline) to the object frame.
+   *  @param[in] vector detection vector storing detection info calculated by object module.
+   */
   void addVector(const DetectionVector& vector);
+
+  /** @brief add tracking vector (got from object pipeline) to the object frame.
+   *  @param[in] vector Tracking vector storing detection info calculated by object module.
+   */
   void addVector(const TrackingVector& vector);
+
+  /** @brief add Localization vector (got from object pipeline) to the object frame.
+   *  @param[in] vector Localication vector storing detection info calculated by object module.
+   */
   void addVector(const LocalizationVector& vector);
-  bool publish();  ///@brief Publish messages with merged object topics
+
+  /** @brief Publish messages with merged object topics.
+   *  @return true if correctly published;
+   *          false otherwise.
+   */
+  bool publish();
+
+  /** @brief Check if object information is enough for further calculating.
+   *         Object information is the one got from object module, such as Detection Vector, Tracking Vector and
+   *         Localization Vector.
+   *         The function is normally invoked before generate or publish the merged topics.
+   *         @return true if data ready, otherwise false.
+   */
   bool isDataReady()
   {
     return !objects_detected_.empty() && !objects_tracked_.empty() && !objects_localized_.empty();
   };
+
+  /** @brief Get transform frame id, which is used for message generation.
+   *         The class stores the frame id getting from object topics.
+   *  @return the string with content of transform frame id.
+   */
   std::string getTfFrameId()
   {
     return tf_frame_id_;
   };
+
+  /** @brief  Get time stamp, which is used for message generation.
+   *          The class stores the timestamp getting from object topics.
+   *  @return The ros::Time value of message.
+   */
   ros::Time getStamp()
   {
     return stamp_;
   };
+
+  /** @brief Merge separate info of detection, tracking and localization into one topic.
+   */
   void mergeObjects();
 
 private:
-  void publishObjectsInGroup();
+  // void publishObjectsInGroup();
+
+  /** @brief find the tracking object from the tracking vector which has the same ROI.
+   *  @param[in] roi Region of interest within an image, which is used to identify the different objects in an image.
+   *  @param[out]track The Tracking object if found.
+   *  @return true if found, otherwise false.
+   */
   bool findTrackingObjectByRoi(const ObjectRoi& roi, TrackingObjectInBox& track);
+
+  /** @brief find the localization object from the tracking vector which has the same ROI.
+   *  @param[in] roi Region of interest within an image, which is used to identify the different objects in an image.
+   *  @param[out]track The Tracking object if found.
+   *  @return true if found, otherwise false.
+   */
   bool findLocalizationObjectByRoi(const ObjectRoi& roi, LocalizationObjectInBox& loc);
+
+  /** @brief Set flag for publish status in case to publish twice.
+   *  @param[in] state Publish state to be set in the class.
+   */
   void setFlagPublished(bool state);
-  // ObjectVector objests;
+
+  ///@brief transform frame id which is archived from object topics and is generated for merged topics.
   std::string tf_frame_id_;
+
+  ///@brief time stamp which is archived from object topics and is generated for merged topics.
   ros::Time stamp_;
+
   ros::NodeHandle nh_;
 
+  ///@brief vectors storing object info(detection, tracking and localization, got from object topics).
   DetectionVector objects_detected_;
   TrackingVector objects_tracked_;
   LocalizationVector objects_localized_;
 
-  ros::Publisher objects_pub_;
-  ObjectMergedVector objects_merged_;
-  bool published_;
+  ros::Publisher objects_pub_; ///@brief ros publisher for merged object topic.
+  ObjectMergedVector objects_merged_; ///@brief vector storing the merged objects.
+  bool published_; ///@brief published status for the merged topic vector. true means published.
 };
 
 }  // namespace

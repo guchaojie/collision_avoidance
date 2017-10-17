@@ -29,15 +29,14 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-#include <boost/thread/thread.hpp>
+//#include <boost/thread/thread.hpp>
 #include <vector>
+#include <ros/ros.h>
+#include <sensor_msgs/RegionOfInterest.h>
 
 #include "ca_policy/ca_policy.h"
 #include "ca_policy/object_frame.h"
 #include "object_bridge_msgs/ObjectMerged.h"
-#include <ros/ros.h>
-#include <sensor_msgs/RegionOfInterest.h>
-//#include <std_msgs/header.h>
 
 namespace intelligent_ca
 {
