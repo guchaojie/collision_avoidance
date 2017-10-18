@@ -34,6 +34,8 @@ After building the workspace, source it via:
     roslaunch water_navigation amcl_demo.launch
 
   > TODO: aml_demo.launch is NOT tuned for LiDAR sensor. It should be probably updated if launching on Water Robot.
+  > NOTE: the map files under ./map folder is not ready for demo use.
+  > It must be updated and/or re-generated for integration test.
 
 ### Security
 
