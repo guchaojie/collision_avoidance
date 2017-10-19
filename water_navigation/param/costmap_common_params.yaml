@@ -3,8 +3,11 @@ max_obstacle_height: 0.60  # assume something like an arm is mounted on top of t
 # Obstacle Cost Shaping (http://wiki.ros.org/costmap_2d/hydro/inflation)
 robot_radius: 0.25  # distance a circular robot should be clear of the obstacle (kobuki: 0.18)
 # footprint: [[x0, y0], [x1, y1], ... [xn, yn]]  # if the robot is not circular
+# footprint: [[0.1, 0.1], [-0.1, 0.1],[-0.1, -0.1], [0.1, -0.1]]  # if the robot is not circular
 
-map_type: voxel
+
+
+map_type: voxel 
 
 obstacle_layer:
   enabled:              true
@@ -29,7 +32,7 @@ obstacle_layer:
     marking: true
     clearing: true
     min_obstacle_height: 0.25
-    max_obstacle_height: 0.85
+    max_obstacle_height: 0.65
   bump:
     data_type: PointCloud2
     topic: mobile_base/sensors/bumper_pointcloud
@@ -43,14 +46,9 @@ obstacle_layer:
 inflation_layer:
   enabled:              true
   cost_scaling_factor:  5.0  # exponential rate at which the obstacle cost drops off (default: 10)
-  inflation_radius:     0.25  # max. distance from an obstacle at which costs are incurred for planning paths.
+  inflation_radius:     0.3  # max. distance from an obstacle at which costs are incurred for planning paths.
 
 static_layer:
   enabled:              true
   
-sonar:
-  topics:                ['/sonar']
-  no_reading_timeout:    0.0
-  clear_threshold:       0.2
-  mark_threshold:        0.8
-  clear_on_max_reading:  false
+
