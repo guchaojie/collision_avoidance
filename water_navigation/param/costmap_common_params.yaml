@@ -51,4 +51,10 @@ inflation_layer:
 static_layer:
   enabled:              true
   
+sonar_layer:
+  topics:                ['/water_uavcan_master/ultrasonic']
+  no_reading_timeout:    0.0
+  clear_threshold:       0.2
+  mark_threshold:        0.8
+  clear_on_max_reading:  false
 
