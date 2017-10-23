@@ -41,6 +41,8 @@
 #define ICA_SONAR_FILTER_H_
 
 namespace intelligent_ca {
+
+const int FILTER_NUMBER = 10;
   
   enum ObstaclePosibility {
     POSSIBILITY_LOW,
@@ -60,7 +62,7 @@ public:
   void update(const sensor_msgs::Range& input_scan);
   
 private:
-  bool checkCorrectSonarDataAndSet(const sensor_msgs::Range& data);
+  bool checkCorrectSonarDataAndSet(sensor_msgs::Range& data);
   void publishSonarData(const sensor_msgs::Range& pub);
   void setPossibilityOfObstacle(float range);
   ObstaclePosibility getPossibilityOfObstacle();
@@ -81,8 +83,10 @@ private:
    l ast correct data.      *
    */
   float last_sonar_data_deprecated_;
-  
+
   float sonar_dist_tolerance_;
+  std::vector<float> distance_array;
+  int count_index;
   ObstaclePosibility possibility_obstacle_;
 };
 

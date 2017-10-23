@@ -44,24 +44,27 @@ namespace intelligent_ca {
 
   SonarFilter::SonarFilter()
     : nh_("~"), listener_(ros::Duration(10)), 
-    last_sonar_data_(INVALID_SONAR_DATA), last_sonar_data_deprecated_(-1)
+    last_sonar_data_(INVALID_SONAR_DATA), last_sonar_data_deprecated_(-1), count_index(0)
   {
-    scan_filtered_pub_ = nh_.advertise<sensor_msgs::Range>("/sonar_filtered", 1);
-    scan_sub_ = nh_.subscribe("/sonar", 1000, &SonarFilter::update, this);
+    scan_filtered_pub_ = nh_.advertise<sensor_msgs::Range>("/water_uavcan_master/sonar_filtered", 1);
+    scan_sub_ = nh_.subscribe("/water_uavcan_master/ultrasonic", 1000, &SonarFilter::update, this);
 
     nh_.param<std::string>("base_frame", base_frame_, "/base_link");
-    
+
     sonar_dist_tolerance_ = 0.3; //TODO:control it in parameter
   }
 
   void SonarFilter::update(const sensor_msgs::Range& input_scan)
   {
-   if (checkCorrectSonarDataAndSet(input_scan)) {
-      publishSonarData(input_scan);
+
+   sensor_msgs::Range output_scan = input_scan;
+
+   if (checkCorrectSonarDataAndSet(output_scan)) {
+      publishSonarData(output_scan);
     } else {
       ROS_WARN("Abnormal Sonar data, do nothing but keep monitoring!");
     }
-    
+
     /**
      * FIXME: Don't do anything for obstacle possiblity prediction, even if for redundent logging.
     if (getPossibilityOfObstacle() >= POSSIBILITY_MED ){
@@ -74,31 +77,30 @@ namespace intelligent_ca {
     scan_filtered_pub_.publish(pub);
   }
   
-  bool SonarFilter::checkCorrectSonarDataAndSet(const sensor_msgs::Range& data)
+  bool SonarFilter::checkCorrectSonarDataAndSet(sensor_msgs::Range& data)
   {
-    
-    ///1. Check if sonar data in the corrent range
-    if (data.range < data.min_range || data.range > data.max_range){
+    float sum=0.0;
+
+    if (count_index < FILTER_NUMBER) {
+      distance_array.push_back(data.range);
+      count_index++;
       return false;
     }
-    
-    bool result = false;
-    float range = data.range;
-    ///2. must compute the possibility of obstacle
-    //FIXME: Possibility of obstacle is only used for algorithm selection
-    setPossibilityOfObstacle(range);
+    else {
+      for(int i = 0;i < (FILTER_NUMBER-1); i++) {
+	  distance_array[i]=distance_array[i+1];
+      }
 
-    getPossibilityOfObstacle();
-    if (sonar_dist_tolerance_ > abs(range - last_sonar_data_deprecated_)
-      || (sonar_dist_tolerance_ > abs(range - last_sonar_data_))){
-      result = true;
-      last_sonar_data_ = range;
-      last_sonar_data_deprecated_ = INVALID_SONAR_DATA;
-    } else {
-      last_sonar_data_deprecated_ = range;
+      distance_array[FILTER_NUMBER-1] = data.range;
+      if (data.range > data.max_range)
+         return true;
+
+      for(int i = 0; i < FILTER_NUMBER; i++) {
+        sum += distance_array[i];
+      }
+      data.range = sum / FILTER_NUMBER;
+      return true;
     }
-    
-    return result;
   }
   
   void SonarFilter::setPossibilityOfObstacle(float range)
@@ -115,7 +117,7 @@ namespace intelligent_ca {
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "sonar_filter");
+  ros::init(argc, argv, "sonar_filter_node");
 
   intelligent_ca::SonarFilter filter;
   ros::spin();
