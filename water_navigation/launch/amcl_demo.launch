@@ -3,6 +3,9 @@
   <arg name="map_file" default="$(env TURTLEBOT_MAP_FILE)"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
+  <!-- sonar filter -->
+  <node pkg="sonar_filter" name="sonar_filter_node" type="sonar_filter_node" />
+
   <!-- AMCL -->
   <arg name="custom_amcl_launch_file" default="$(find water_navigation)/launch/includes/amcl.launch.xml"/>
   <arg name="initial_pose_x" default="0.0"/> <!-- Use 17.0 for willow's map in simulation -->
