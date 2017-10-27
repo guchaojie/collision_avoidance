@@ -16,8 +16,8 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 # Add_executables
-add_executable(sonar_filter src/sonar_filter.cpp)
-target_link_libraries(sonar_filter ${catkin_LIBRARIES})
+add_executable(sonar_filter_node src/sonar_filter.cpp)
+target_link_libraries(sonar_filter_node ${catkin_LIBRARIES})
 
 
 #############
@@ -25,7 +25,7 @@ target_link_libraries(sonar_filter ${catkin_LIBRARIES})
 #############
 
 # Mark executables and/or libraries for installation
-install(TARGETS sonar_filter
+install(TARGETS sonar_filter_node
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

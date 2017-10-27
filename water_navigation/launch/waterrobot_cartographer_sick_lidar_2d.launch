@@ -20,7 +20,7 @@
     <arg name="configuration_basename" value="waterrobot_sick_lidar_2d.lua" />
   </include>
   
-  <include file="$(find waterrobot_navigation)/launch/waterrobot_move_base.launch.xml" />
+  <include file="$(find water_navigation)/launch/includes/move_base.slave.launch.xml" />
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find waterrobot_cartographer)/rviz/waterrobot.rviz" />
 	
 </launch>
