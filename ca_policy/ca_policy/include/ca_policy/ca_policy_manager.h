@@ -50,16 +50,35 @@ class CaPolicyManager
 public:
   CaPolicyManager();
   virtual ~CaPolicyManager();
+
+  /** @brief add CA policy by the given name and policy instance.
+   *  @param[in] name   The name of the policy to be added.
+   *  @param[in] policy Policy to be added.
+   *  @return true if successfully added, otherwise false.
+   */
   bool addPolicy(const std::string name, const CaPolicy& policy);
+
+  /** @brief delete CA policy by the give policy name.
+   *  @param[in] name The name of the policy to be deleted.
+   *  @return true if successfully deleted, otherwise false.
+   */
   bool deletePolicy(const std::string name);
-  CaPolicy getPolicyByName(const std::string name);
-  // bool publish();
+
+  // CaPolicy getPolicyByName(const std::string name);
+
   bool setCurrentPolicy(const std::string name);
 
 private:
+
+  /** @brief Search and return the CA policy by the given name.
+   *  @param[in] name The name of the policy to be searched.
+   *  @param[out] pair The iterator of the policy found.
+   *  @return true if found, otherwise false.
+   */
   bool findPolicy(const std::string name, CaPolicyVector::iterator& pair);
-  CaPolicyVector policies_;
-  CaPolicyPair current_policy_;
+
+  CaPolicyVector policies_; ///@brief CA policy list
+  CaPolicyPair current_policy_; ///@brief The working CA policy, which is used to configure navigation.
 };
 
 }  // namespace

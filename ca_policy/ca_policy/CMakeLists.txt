@@ -4,7 +4,7 @@ project(ca_policy)
 add_definitions(-std=c++11)
 
 # Load catkin and all dependencies required for this package
-find_package(catkin REQUIRED COMPONENTS tf roscpp std_msgs
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs
 		object_pipeline_msgs
 		object_bridge_msgs
 		ros_yolo_msgs
@@ -12,7 +12,7 @@ find_package(catkin REQUIRED COMPONENTS tf roscpp std_msgs
 
 # What other packages will need to use this package
 catkin_package(
-    CATKIN_DEPENDS tf roscpp sensor_msgs std_msgs
+    CATKIN_DEPENDS roscpp sensor_msgs std_msgs
 )
 
 
