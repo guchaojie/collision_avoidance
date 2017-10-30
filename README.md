@@ -31,10 +31,18 @@ This package was verified under Ubuntu 16.04 with ROS kinectic environment.
 Follow [ROS Wiki](http://wiki.ros.org/ROS/Installation) and [catkin 
 tool](http://wiki.ros.org/catkin) to download related packages in your Linux machine.
 
+> NOTE: Currently for AMR POC Demo, turtlebot_navigation package is ignored for catkin_make. 
+> If you want to use turtlebot base for debugging or demo use, please remove CATKIN_IGNORE under
+> its folder before code building first.
+
 ### 2. Download code to your local storage
     mkdir -p ~/catkin_ws/src
     cd ~/catkin_ws/src
     git clone https://github.intel.com/otc-rse/AMR_ros_collision_avoidance.git
+	cd AMR_ros_collision_avoidance/navigation_layers
+	git submodule init
+	git submodule update
+	git checkout demo
 
 ### 3. Build code
     cd ~/catkin_ws

@@ -1,0 +1,9 @@
+<launch>
+  <!-- sonar filter -->
+  <node pkg="sonar_filter" name="sonar_filter_node" type="sonar_filter_node" />
+
+  <!-- Move base -->
+  <include file="$(find water_navigation)/launch/includes/move_base.slave.launch.xml"/>
+
+</launch>
+
