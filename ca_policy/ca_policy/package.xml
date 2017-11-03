@@ -17,6 +17,8 @@
   <build_depend>ca_policy_msgs</build_depend>
   <build_depend>object_pipeline_msgs</build_depend>
   <build_depend>ros_yolo_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>ca_policy_msgs</run_depend>
@@ -25,5 +27,7 @@
   <run_depend>object_bridge_msgs</run_depend>
   <run_depend>object_pipeline_msgs</run_depend>
   <run_depend>ros_yolo_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>dynamic_reconfigure</run_depend>
 
 </package>

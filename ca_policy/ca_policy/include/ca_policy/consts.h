@@ -42,8 +42,9 @@
 #include <ros_yolo_msgs/ObjectInBox.h>
 #include <ros_yolo_msgs/ObjectsInBoxes.h>
 
-#include "object_bridge_msgs/ObjectMerged.h"
-#include "object_bridge_msgs/ObjectsInFrameMerged.h"
+#include <object_bridge_msgs/ObjectMerged.h>
+#include <object_bridge_msgs/ObjectsInFrameMerged.h>
+#include <object_bridge_msgs/SocialObject.h>
 
 namespace intelligent_ca
 {
@@ -63,16 +64,35 @@ using LocalizationVector = std::vector<LocalizationObjectInBox>;
 using MergedObject = object_bridge_msgs::ObjectMerged;
 using ObjectMergedVector = std::vector<MergedObject>;
 using ObjectMergedMsg = object_bridge_msgs::ObjectsInFrameMerged;
+using SocialObjectMsg = object_bridge_msgs::SocialObject;
 
 using ObjectRoi = sensor_msgs::RegionOfInterest;
 
-constexpr char* kTopicObjectDetection = "/todo";  // TODO
-// const std::string kTopicObjectDetection = "/todo";          // TODO
-constexpr char* kTopicObjectTracking = "/todo";           // TODO
-constexpr char* kTopicObjectLocalization = "/result_3d";  // TODO
-
+/*
+constexpr char* kTopicObjectDetection = "/todo"; // TODO
+constexpr char* kTopicObjectLocalization = "/result_3d"; // TODO
 constexpr char* kTopicCaPolicy = "/ca_policy";
-constexpr char* kTopicObjectsInFrame = "/object_merged";
+constexpr char* kTopicObjectsInFrame = "object_merged";
+constexpr char* kTopicSocialObjectInFrame = "";
+*/
+const std::string kTopicObjectDetection = "/object_pipeline/detection";
+const std::string kTopicObjectTracking = "/object_pipeline/tracking";
+const std::string kTopicObjectLocalization = "/object_pipeline/localization";
 
-}  // namespace
+const std::string kTopicCaPolicy = "ca_policy";
+const std::string kTopicObjectsInFrame = "object_merged";
+const std::string kTopicSocialObjectInFrame = "social_object";
+
+/**
+bool isEqual(const ObjectRoi& left, const ObjectRoi& right)
+{
+  if (left.x_offset == right.x_offset && left.y_offset == right.y_offset && left.width == right.width
+      && left.height == right.height)
+  {
+    return true;
+  }
+  return false;
+}*/
+
+} // namespace
 #endif

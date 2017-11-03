@@ -40,24 +40,55 @@
 
 namespace intelligent_ca
 {
+constexpr int kDefaultMaxFrames=10;
+
 class Obstacles
 {
 public:
   Obstacles();
   Obstacles(ros::NodeHandle nh);
   virtual ~Obstacles();
+
+  /** @brief Search and return the instance of a frame by the given frame_id and time stamp.
+   *         If no cached instance, create a new one and return it.
+   *  @param[in] stamp    The time stamp when the frame is taken, which is used to search the frame.
+   *  @param[in] frame_id The id the frame, which is used to search the frame.
+   *  @return the pointer to the frame instance.
+   */
   std::shared_ptr<CaObjectFrame> getInstance(ros::Time stamp, std::string frame_id);
+
+  /** @brief Add Object Frame into obstacles list.
+   *  @param[in] frame The object frame to be added.
+   *  @return    true  If succeeded in adding,
+   *             false otherwise.
+   */
   bool addObjectFrame(const CaObjectFrame*& frame);
+
+  /** @brief Find and return the object frame by the given time stamp and frame id.
+   *  @param[in]  stamp     The time stamp when the frame is taken, which is used to search the frame.
+   *  @param[in]  frame_id  The id the frame, which is used to search the frame.
+   *  @param[out] frame_out The pointer to the frame if found
+   *  @return     true      if succeeded in adding,
+   *              false     otherwise.
+   */
   bool findObjectFrame(ros::Time stamp, std::string frame_id, std::shared_ptr<CaObjectFrame> frame_out);
-  // std::vector<CaObjectFrame> getAllFrames();
-  // virtual geometry_msgs::Point32 getObstacleCenterPos();
-  bool calcVelocity(void);
+
+  /** @brief Calculate the velocity info for objects in the given frame.
+   *  @param[in] frame The pointer to the frame to be processed.
+   */
+  void calcVelocity(std::shared_ptr<CaObjectFrame>& frame);
+
+  /** @brief Publish messages for objects in the given frame.
+   *  @param[in] frame The pointer to the frame to be processed.
+   */
   void publish(std::shared_ptr<CaObjectFrame>& frame);
+
+  /** @brief Clean the cached frames and remove the old ones if the size of frames is over the threshold. */
   void clearOldFrames();
 
 private:
   std::vector<CaObjectFrame> frames_;
-  int max_frames_;  ///@brief The number of frames to be archived in memory.
+  int max_frames_;  /**< The number of frames to be archived in memory. */
   ros::NodeHandle nh_;
 };
 

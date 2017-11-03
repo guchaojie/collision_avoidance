@@ -36,13 +36,19 @@
 
 #include "ca_policy/ca_policy.h"
 #include "ca_policy/object_frame.h"
-#include "object_bridge_msgs/ObjectMerged.h"
+#include <object_bridge_msgs/ObjectMerged.h>
+#include <object_bridge_msgs/SocialObject.h>
+
 
 namespace intelligent_ca
 {
-CaObjectFrame::CaObjectFrame() : nh_("~"), published_(false)
+CaObjectFrame::CaObjectFrame() :
+    nh_("/intelligent_ca/"), published_(false)
 {
-  objects_pub_ = nh_.advertise<object_bridge_msgs::ObjectsInFrameMerged>(kTopicObjectsInFrame, 1);
+  merged_objects_pub_ = nh_.advertise<object_bridge_msgs::ObjectsInFrameMerged>(kTopicObjectsInFrame, 1);
+  social_object_pub_ = nh_.advertise<object_bridge_msgs::SocialObject>(kTopicSocialObjectInFrame, 1);
+
+  initParameter();
 
   objects_detected_.clear();
   objects_tracked_.clear();
@@ -51,18 +57,40 @@ CaObjectFrame::CaObjectFrame() : nh_("~"), published_(false)
   objects_merged_.clear();
 }
 
-CaObjectFrame::CaObjectFrame(ros::NodeHandle nh) : nh_(nh), published_(false)
+CaObjectFrame::CaObjectFrame(ros::NodeHandle nh) :
+    nh_(nh), published_(false)
 {
-  objects_pub_ = nh_.advertise<object_bridge_msgs::ObjectsInFrameMerged>(kTopicObjectsInFrame, 1);
+  merged_objects_pub_ = nh_.advertise<object_bridge_msgs::ObjectsInFrameMerged>(kTopicObjectsInFrame, 1);
+  social_object_pub_ = nh_.advertise<object_bridge_msgs::SocialObject>(kTopicSocialObjectInFrame, 1);
+
+  initParameter();
 
   objects_detected_.clear();
   objects_tracked_.clear();
   objects_localized_.clear();
+
+  objects_merged_.clear();
 }
 
 CaObjectFrame::~CaObjectFrame()
 {
 }
+
+void CaObjectFrame::initParameter()
+{
+  nh_.param("social_msg_enabled", social_msg_enabled_, true);
+  nh_.param("merged_op_msg_enabled", merged_op_msg_enabled_, true);
+
+  /*server_ = new dynamic_reconfigure::Server<ca_policy1::CaObjectFrameConfig>(nh_);
+  cb_reconfigure_ = boost::bind(&CaObjectFrame::configure, this, _1, _2);
+  server_->setCallback(cb_reconfigure_);*/
+}
+/*
+void CaObjectFrame::configure(ca_policy1::CaObjectFrameConfig &config, uint32_t level)
+{
+  social_msg_enabled_ = config.social_msg_enabled;
+  merged_op_msg_enabled_ = config.merged_op_msg_enabled;
+}*/
 
 void CaObjectFrame::addVector(const DetectionVector& vector)
 {
@@ -92,7 +120,7 @@ void CaObjectFrame::mergeObjects()
 {
   if (published_ || isDataReady())
   {
-    // ROS_WARN("Already published or data not ready. Do nothing");
+    ROS_WARN("Already published or data not ready. Do nothing");
     return;
   }
 
@@ -116,20 +144,37 @@ void CaObjectFrame::mergeObjects()
         merged_obj.type = it->object.object_name;
         merged_obj.probability = it->object.probability;
         merged_obj.roi = it->roi;
+        merged_obj.velocity.x = merged_obj.velocity.y = merged_obj.velocity.z = -1.0;
 
         objects_merged_.push_back(merged_obj);
       }
     }
 
-  }  // end of for(...)
+  } // end of for(...)
+}
+
+bool CaObjectFrame::findMergedObjectByRoi(const ObjectRoi& roi, MergedObject& out)
+{
+  ObjectMergedVector temp_objects = objects_merged_;
+  for (auto t : temp_objects)
+  {
+    if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width
+        && roi.height == t.roi.height)
+    {
+      out = t;
+      return true;
+    }
+  }
+
+  return false;
 }
 
 bool CaObjectFrame::findTrackingObjectByRoi(const ObjectRoi& roi, TrackingObjectInBox& track)
 {
   for (auto t : objects_tracked_)
   {
-    if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width &&
-        roi.height == t.roi.height)
+    if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width
+        && roi.height == t.roi.height)
     {
       track = t;
       return true;
@@ -143,8 +188,8 @@ bool CaObjectFrame::findLocalizationObjectByRoi(const ObjectRoi& roi, Localizati
 {
   for (auto t : objects_localized_)
   {
-    if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width &&
-        roi.height == t.roi.height)
+    if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width
+        && roi.height == t.roi.height)
     {
       loc = t;
       return true;
@@ -158,28 +203,47 @@ bool CaObjectFrame::publish()
 {
   if (published_)
   {
-    ROS_WARN("Merged objects have been already published, do nothing");
+    ROS_ERROR("Merged objects have been already published, do nothing");
     return false;
   }
 
-  try
+  if (!objects_merged_.empty())
   {
-    if (!objects_merged_.empty())
+    if (merged_op_msg_enabled_)
     {
       ObjectMergedMsg msg;
       msg.header.frame_id = tf_frame_id_;
       msg.header.stamp = stamp_;
       msg.objects = objects_merged_;
-      objects_pub_.publish(msg);
-
-      setFlagPublished(true);
-      return true;
+      merged_objects_pub_.publish(msg);
     }
-  }
-  catch (...)
-  {
-    ROS_ERROR("Error when CaObjectFrame::publish");
-    return false;
+
+    if(social_msg_enabled_)
+    {
+      SocialObjectMsg msg;
+      msg.header.frame_id = tf_frame_id_;
+      msg.header.stamp = stamp_;
+      for (auto ob: objects_merged_)
+      {
+        if(isSocialObject(ob))
+        {
+          msg.name = ob.type;
+          geometry_msgs::Point32 c = getCentroid(ob);
+          msg.position.x = c.x;
+          msg.position.y = c.y;
+          msg.position.z = c.z;
+          msg.velocity = ob.velocity;
+          msg.reliability = ob.probability;
+          msg.tagnames.clear(); /**< Not used */
+          msg.tags.clear(); /**< Not used */
+          social_object_pub_.publish(msg);
+        }
+      }
+
+    }
+    setFlagPublished(true);
+
+    return true;
   }
 
   return false;
@@ -189,4 +253,4 @@ void CaObjectFrame::setFlagPublished(bool state)
 {
   published_ = state;
 }
-}  // namespace
+} // namespace

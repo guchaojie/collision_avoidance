@@ -38,9 +38,13 @@ using namespace intelligent_ca;
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "object_merger");
+  ROS_INFO("ENTER ca_policy node.. ");
+  ros::init(argc, argv, "ca_policy");
+
+  ROS_ERROR("ENTER ca_policy node. ");
+  ROS_WARN("ENTER ca_policy node.. ");
+  ROS_DEBUG("ENTER ca_policy node.. ");
 
   ObjectMerger merger;
-  ;
   ros::spin();
 }

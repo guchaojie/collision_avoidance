@@ -43,8 +43,10 @@ namespace intelligent_ca
 {
 ObjectMerger::ObjectMerger() : nh_("~")
 {
+  ROS_ERROR("ENTER ObjectMerger Constructor...");
+
   detection_sub_ = nh_.subscribe(kTopicObjectDetection, 10, &ObjectMerger::onObjectDetected, this);
-  tracking_sub_ = nh_.subscribe(kTopicObjectDetection, 10, &ObjectMerger::onObjectTracked, this);
+  tracking_sub_ = nh_.subscribe(kTopicObjectTracking, 10, &ObjectMerger::onObjectTracked, this);
   localization_sub_ = nh_.subscribe(kTopicObjectLocalization, 10, &ObjectMerger::onObjectLocalized, this);
 
   /// We assume the maximum object detected in one camera frame is less than 10
@@ -67,6 +69,8 @@ ObjectMerger::~ObjectMerger()
 
 void ObjectMerger::onObjectDetected(const ros_yolo_msgs::ObjectsInBoxesConstPtr& msg)
 {
+  //ROS_ERROR("RECEIVE Object Detection topic...");
+  ROS_WARN("RECEIVE Object Detection topic...");
   std::shared_ptr<CaObjectFrame> frame = frames_->getInstance(msg->header.stamp, msg->header.frame_id);
 
   frame->addVector(msg->objects_vector);
@@ -82,6 +86,7 @@ void ObjectMerger::onObjectTracked(const object_pipeline_msgs::TrackedObjectsCon
   frame->addVector(msg->tracked_objects);
   frames_->publish(frame);
   frames_->clearOldFrames();
+  ROS_ERROR("RECEIVE Object Tracking topic...");
 }
 
 void ObjectMerger::onObjectLocalized(const object_pipeline_msgs::ObjectsInBoxes3DConstPtr& msg)
@@ -91,6 +96,8 @@ void ObjectMerger::onObjectLocalized(const object_pipeline_msgs::ObjectsInBoxes3
   frame->addVector(msg->objects_in_boxes);
   frames_->publish(frame);
   frames_->clearOldFrames();
+
+  ROS_ERROR("RECEIVE Object Localization topic...");
 }
 
 }  // namespace

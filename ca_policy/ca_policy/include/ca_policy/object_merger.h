@@ -42,6 +42,14 @@
 
 namespace intelligent_ca
 {
+
+/** @brief Merging camera related messages into one, with more info(currently velocity) added.
+ *         When a given message is received:
+ *         1. The class searches the corresponding frame by the same frame_id and stamp, if no, creates a new frame.
+ *         2. Add the message to the frame which filtered out in step1.
+ *         3. Publish the ready frame(s).
+ *         4. Clean the frames which are not in the monitoring window.
+ */
 class ObjectMerger
 {
 public:
@@ -50,18 +58,29 @@ public:
   virtual ~ObjectMerger();
 
 private:
+  /** @brief Callback function when receiving messages from ros_yolo package.
+   *  @param[in] msg The received message (typed in ros_yolo_msgs::ObjectsInBoxes)
+   */
   void onObjectDetected(const ros_yolo_msgs::ObjectsInBoxesConstPtr& msg);
+
+  /** @brief Callback function when receiving messages from object_pipeline package.
+   *  @param[in] msg The received message (typed in object_pipeline_msgs::TrackedObjects)
+   */
   void onObjectTracked(const object_pipeline_msgs::TrackedObjectsConstPtr& msg);
+
+  /** @brief Callback function when receiving messages from object_pipeline package.
+   *  @param[in] msg The received message (typed in object_pipeline_msgs::ObjectsInBoxes3D)
+   */
   void onObjectLocalized(const object_pipeline_msgs::ObjectsInBoxes3DConstPtr& msg);
 
-  std::shared_ptr<Obstacles> pObstacle_;
+  //std::shared_ptr<Obstacles> pObstacle_;
   ros::NodeHandle nh_;
 
-  ros::Subscriber detection_sub_;
-  ros::Subscriber tracking_sub_;
-  ros::Subscriber localization_sub_;
+  ros::Subscriber detection_sub_;    /// the subscriber of detection messages
+  ros::Subscriber tracking_sub_;     /// the subscriber of tracking messages
+  ros::Subscriber localization_sub_; /// the subscriber of localization messages
 
-  std::shared_ptr<Obstacles> frames_;
+  std::shared_ptr<Obstacles> frames_; /// the frames storing all obstacles' info
 };
 
 }  // namespace

@@ -1,0 +1,9 @@
+<launch>
+
+  <!-- ca_policy -->
+  <node pkg="ca_policy" name="ca_policy" type="ca_policy" >
+    <rosparam file="$(find ca_policy)/param/ca_policy.yaml" command="load" />
+  </node>
+
+</launch>
+

@@ -44,24 +44,53 @@ namespace intelligent_ca
 Obstacles::Obstacles(ros::NodeHandle nh) : nh_(nh)
 {
   frames_.clear();
-  max_frames_ = 10;  ///@todo, Set the max number of frames in memory with parameter system.
+  nh_.param("max_frames", max_frames_, kDefaultMaxFrames);
 }
 
-Obstacles::Obstacles() : nh_("~")
+Obstacles::Obstacles() : nh_("/intelligent_ca/")
 {
   frames_.clear();
-  max_frames_ = 10;  ///@todo, Set the max number of frames in memory with parameter system.
+  nh_.param("max_frames", max_frames_, kDefaultMaxFrames);
 }
 
 Obstacles::~Obstacles()
 {
 }
 
-bool Obstacles::calcVelocity(void)
+void Obstacles::calcVelocity(std::shared_ptr<CaObjectFrame>& frame)
 {
-  /// TODO:
+  ObjectMergedVector objects = frame->getMergedObjects();
+  std::vector<CaObjectFrame> frames = frames_;
 
-  return true;
+  unsigned int size_frames = frames.size();
+  for (auto ob : objects)
+  {
+    /**< Find the latest objects from frames (in reverse order) */
+    for(unsigned int i = size_frames; i>0; --i)
+    {
+      MergedObject out;
+      double duration = frames[i-1].getStamp().toSec() - frame->getStamp().toSec();
+      if (duration <= 0.0)
+      {
+        break;
+      }
+      if(frames[i-1].findMergedObjectByRoi(ob.roi, out))
+      {
+        geometry_msgs::Point32 from = CaObjectFrame::getCentroid(ob);
+        geometry_msgs::Point32 to = CaObjectFrame::getCentroid(out);
+        double distance_x = to.x - from.x;
+        double distance_y = to.y - from.y;
+        double distance_z = to.z - from.z;
+
+        /**< @todo, double check it is set correctly */
+        ob.velocity.x = distance_x / duration;
+        ob.velocity.y = distance_y / duration;
+        ob.velocity.z = distance_z / duration;
+        break;
+      }
+
+    }
+  }
 }
 
 void Obstacles::clearOldFrames()
@@ -76,7 +105,7 @@ void Obstacles::clearOldFrames()
 
 void Obstacles::publish(std::shared_ptr<CaObjectFrame>& frame)
 {
-  calcVelocity();
+  calcVelocity(frame);
   frame->publish();
 }
 
