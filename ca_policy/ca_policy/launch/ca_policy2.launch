@@ -1,0 +1,12 @@
+<launch>
+
+  <!-- ca_policy -->
+  <node pkg="ca_policy" name="ca_policy" type="ca_policy" >
+    <rosparam file="$(find ca_policy)/param/ca_policy.yaml" command="load" />
+    <remap from="detected_object" to="/object_pipeline/detection" />
+    <remap from="tracked_object" to="/object_pipeline/tracking" />
+    <remap from="localized_object" to="/object_pipeline/localization" />
+  </node>
+
+</launch>
+
