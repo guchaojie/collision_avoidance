@@ -79,7 +79,6 @@ namespace intelligent_ca {
 
   bool SonarFilter::checkCorrectSonarDataAndSet(sensor_msgs::Range& data)
   {
-    float sum=0.0;
 
     if (count_index < FILTER_NUMBER) {
       distance_array.push_back(data.range);
@@ -95,6 +94,7 @@ namespace intelligent_ca {
       if (data.range > data.max_range)
          return true;
 
+      float sum=0.0;
       for(int i = 0; i < FILTER_NUMBER; i++) {
         sum += distance_array[i];
       }
