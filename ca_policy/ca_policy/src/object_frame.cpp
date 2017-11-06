@@ -33,12 +33,11 @@
 #include <vector>
 #include <ros/ros.h>
 #include <sensor_msgs/RegionOfInterest.h>
-
-#include "ca_policy/ca_policy.h"
+#include <iostream>
+//#include "ca_policy/ca_policy.h"
 #include "ca_policy/object_frame.h"
 #include <object_bridge_msgs/ObjectMerged.h>
 #include <object_bridge_msgs/SocialObject.h>
-
 
 namespace intelligent_ca
 {
@@ -72,6 +71,22 @@ CaObjectFrame::CaObjectFrame(ros::NodeHandle nh) :
   objects_merged_.clear();
 }
 
+CaObjectFrame::CaObjectFrame(ros::Time& stamp, std::string& frame_id, ros::NodeHandle nh) :
+    nh_(nh), published_(false)
+{
+  merged_objects_pub_ = nh_.advertise<object_bridge_msgs::ObjectsInFrameMerged>(kTopicObjectsInFrame, 1);
+  social_object_pub_ = nh_.advertise<object_bridge_msgs::SocialObject>(kTopicSocialObjectInFrame, 1);
+
+  initParameter();
+
+  objects_detected_.clear();
+  objects_tracked_.clear();
+  objects_localized_.clear();
+
+  objects_merged_.clear();
+  stamp_ = stamp;
+  tf_frame_id_ = frame_id;
+}
 CaObjectFrame::~CaObjectFrame()
 {
 }
@@ -81,49 +96,66 @@ void CaObjectFrame::initParameter()
   nh_.param("social_msg_enabled", social_msg_enabled_, true);
   nh_.param("merged_op_msg_enabled", merged_op_msg_enabled_, true);
 
+  is_merging_ = false;
   /*server_ = new dynamic_reconfigure::Server<ca_policy1::CaObjectFrameConfig>(nh_);
-  cb_reconfigure_ = boost::bind(&CaObjectFrame::configure, this, _1, _2);
-  server_->setCallback(cb_reconfigure_);*/
+   cb_reconfigure_ = boost::bind(&CaObjectFrame::configure, this, _1, _2);
+   server_->setCallback(cb_reconfigure_);*/
 }
 /*
-void CaObjectFrame::configure(ca_policy1::CaObjectFrameConfig &config, uint32_t level)
-{
-  social_msg_enabled_ = config.social_msg_enabled;
-  merged_op_msg_enabled_ = config.merged_op_msg_enabled;
-}*/
+ void CaObjectFrame::configure(ca_policy1::CaObjectFrameConfig &config, uint32_t level)
+ {
+ social_msg_enabled_ = config.social_msg_enabled;
+ merged_op_msg_enabled_ = config.merged_op_msg_enabled;
+ }*/
 
 void CaObjectFrame::addVector(const DetectionVector& vector)
 {
-  for (auto obj : vector)
-  {
-    objects_detected_.push_back(obj);
-  }
+  ROS_ERROR("add detection vector ... ");
+  int i = 0;
+  /*for (auto obj : vector)
+   {
+   ROS_ERROR("... Object %d", i++);
+   objects_detected_.push_back(obj);
+   }*/
+  objects_detected_ = vector;
+  mergeObjects();
+  //std::cout << "THe detected objests: " << objects_detected_;
+  ROS_ERROR("size of  objests_detected: %d", objects_detected_.size());
 }
 
 void CaObjectFrame::addVector(const TrackingVector& vector)
 {
-  for (auto obj : vector)
-  {
-    objects_tracked_.push_back(obj);
-  }
+
+  objects_tracked_ = vector;
+  mergeObjects();
+
 }
 
 void CaObjectFrame::addVector(const LocalizationVector& vector)
 {
-  for (auto obj : vector)
-  {
-    objects_localized_.push_back(obj);
-  }
+
+  objects_localized_ = vector;
+  mergeObjects();
+
 }
 
 void CaObjectFrame::mergeObjects()
 {
-  if (published_ || isDataReady())
+  if (is_merging_)
+  {
+    ROS_ERROR("Objects is already merging...");
+    return;
+  }
+
+  ROS_ERROR("published:%s, data ready:%s", published_ ? "true" : "false", isDataReady() ? "true" : "false");
+  if (published_ || !isDataReady())
   {
     ROS_WARN("Already published or data not ready. Do nothing");
     return;
   }
 
+  ROS_ERROR("MERGING...");
+  is_merging_ = true;
   for (DetectionVector::iterator it = objects_detected_.begin(); it != objects_detected_.end(); ++it)
   {
     ObjectRoi roi = it->roi;
@@ -135,9 +167,11 @@ void CaObjectFrame::mergeObjects()
     result = findTrackingObjectByRoi(roi, track_obj);
     if (result)
     {
+      ROS_ERROR("...Found Tracking Objects.");
       result = findLocalizationObjectByRoi(roi, loc_obj);
       if (result)
       {
+        ROS_ERROR("...Found Localization Objects.");
         merged_obj.min = loc_obj.min;
         merged_obj.max = loc_obj.max;
         merged_obj.id = track_obj.id;
@@ -149,18 +183,35 @@ void CaObjectFrame::mergeObjects()
         objects_merged_.push_back(merged_obj);
       }
     }
+    ROS_ERROR("size of objects_merged: %d", objects_merged_.size());
 
   } // end of for(...)
+  is_merging_ = false;
 }
-
+bool CaObjectFrame::findMergedObjectById(const int id, MergedObject& out)
+{
+  ObjectMergedVector temp_objects = objects_merged_;
+  for (auto t : temp_objects)
+  {
+    if (t.id == id)
+    {
+      ROS_ERROR("<<<Finding merged objects by ID...>");
+      out = t;
+      return true;
+    }
+  }
+  return false;
+}
 bool CaObjectFrame::findMergedObjectByRoi(const ObjectRoi& roi, MergedObject& out)
 {
   ObjectMergedVector temp_objects = objects_merged_;
   for (auto t : temp_objects)
   {
+
     if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width
         && roi.height == t.roi.height)
     {
+      ROS_ERROR("<<<Finding merged objects by ROI...>");
       out = t;
       return true;
     }
@@ -188,6 +239,7 @@ bool CaObjectFrame::findLocalizationObjectByRoi(const ObjectRoi& roi, Localizati
 {
   for (auto t : objects_localized_)
   {
+
     if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width
         && roi.height == t.roi.height)
     {
@@ -201,6 +253,8 @@ bool CaObjectFrame::findLocalizationObjectByRoi(const ObjectRoi& roi, Localizati
 
 bool CaObjectFrame::publish()
 {
+  ROS_ERROR("ENTER CaObjectFrame::publish(): merged_op_msg_enabled_=%s, social_msg_enabled_=%s",
+            merged_op_msg_enabled_ ? "true" : "false", social_msg_enabled_ ? "true" : "false");
   if (published_)
   {
     ROS_ERROR("Merged objects have been already published, do nothing");
@@ -209,6 +263,7 @@ bool CaObjectFrame::publish()
 
   if (!objects_merged_.empty())
   {
+    ROS_ERROR("not EMPTY!!!");
     if (merged_op_msg_enabled_)
     {
       ObjectMergedMsg msg;
@@ -218,14 +273,14 @@ bool CaObjectFrame::publish()
       merged_objects_pub_.publish(msg);
     }
 
-    if(social_msg_enabled_)
+    if (social_msg_enabled_)
     {
       SocialObjectMsg msg;
       msg.header.frame_id = tf_frame_id_;
       msg.header.stamp = stamp_;
-      for (auto ob: objects_merged_)
+      for (auto ob : objects_merged_)
       {
-        if(isSocialObject(ob))
+        if (isSocialObject(ob))
         {
           msg.name = ob.type;
           geometry_msgs::Point32 c = getCentroid(ob);

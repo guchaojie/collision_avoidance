@@ -49,6 +49,7 @@ class CaObjectFrame
 public:
   CaObjectFrame();
   CaObjectFrame(ros::NodeHandle nh);
+  CaObjectFrame(ros::Time& stamp, std::string& frame_id, ros::NodeHandle nh=ros::NodeHandle("~"));
   virtual ~CaObjectFrame();
 
   // init(ObjectVector& vector);
@@ -82,6 +83,11 @@ public:
    */
   bool isDataReady()
   {
+    ROS_ERROR("Data Ready ==detection:%s==tracking:%s==localization:%s",
+              objects_detected_.empty()?"false":"true",
+                  objects_tracked_.empty()?"false":"true",
+                      objects_localized_.empty()?"false":"true"
+    );
     return !objects_detected_.empty() && !objects_tracked_.empty() && !objects_localized_.empty();
   };
 
@@ -113,6 +119,7 @@ public:
    *  @return true if found, otherwise false.
    */
   bool findMergedObjectByRoi(const ObjectRoi& roi, MergedObject& track);
+  bool findMergedObjectById(const int id, MergedObject& out);
 
   ObjectMergedVector& getMergedObjects(){return objects_merged_;};
 
@@ -188,6 +195,8 @@ private:
   bool merged_op_msg_enabled_;
   //dynamic_reconfigure::Server<ca_policy1::CaObjectFrameConfig>* server_;
   //dynamic_reconfigure::Server<ca_policy1::CaObjectFrameConfig>::CallbackType cb_reconfigure_;
+
+  bool is_merging_;
 };
 
 }  // namespace

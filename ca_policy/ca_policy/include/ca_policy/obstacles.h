@@ -40,7 +40,7 @@
 
 namespace intelligent_ca
 {
-constexpr int kDefaultMaxFrames=10;
+constexpr int kDefaultMaxFrames=20;
 
 class Obstacles
 {
@@ -62,7 +62,7 @@ public:
    *  @return    true  If succeeded in adding,
    *             false otherwise.
    */
-  bool addObjectFrame(const CaObjectFrame*& frame);
+  bool addObjectFrame(CaObjectFrame*& frame);
 
   /** @brief Find and return the object frame by the given time stamp and frame id.
    *  @param[in]  stamp     The time stamp when the frame is taken, which is used to search the frame.
@@ -71,22 +71,27 @@ public:
    *  @return     true      if succeeded in adding,
    *              false     otherwise.
    */
-  bool findObjectFrame(ros::Time stamp, std::string frame_id, std::shared_ptr<CaObjectFrame> frame_out);
+  bool findObjectFrame(ros::Time stamp, std::string frame_id, std::shared_ptr<CaObjectFrame>& frame_out);
 
-  /** @brief Calculate the velocity info for objects in the given frame.
-   *  @param[in] frame The pointer to the frame to be processed.
-   */
-  void calcVelocity(std::shared_ptr<CaObjectFrame>& frame);
-
-  /** @brief Publish messages for objects in the given frame.
-   *  @param[in] frame The pointer to the frame to be processed.
-   */
-  void publish(std::shared_ptr<CaObjectFrame>& frame);
 
   /** @brief Clean the cached frames and remove the old ones if the size of frames is over the threshold. */
   void clearOldFrames();
 
+  void addVector(ros::Time stamp, std::string frame_id, const DetectionVector& vector);
+  void addVector(ros::Time stamp, std::string frame_id, const TrackingVector& vector);
+  void addVector(ros::Time stamp, std::string frame_id, const LocalizationVector& vector);
+
 private:
+
+  /** @brief Calculate the velocity info for objects in the given frame.
+   *  @param[in] frame The pointer to the frame to be processed.
+   */
+  void calcVelocity(std::vector<CaObjectFrame>::iterator& frame);
+
+  /** @brief Publish messages for objects in the given frame.
+   *  @param[in] frame The pointer to the frame to be processed.
+   */
+  void publish(std::vector<CaObjectFrame>::iterator& frame);
   std::vector<CaObjectFrame> frames_;
   int max_frames_;  /**< The number of frames to be archived in memory. */
   ros::NodeHandle nh_;

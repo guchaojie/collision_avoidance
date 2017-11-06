@@ -30,18 +30,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
-#include <boost/thread/thread.hpp>
+#include <ros/ros.h>
 #include <vector>
 
-#include "ca_policy/ca_policy.h"
 #include "ca_policy/object_merger.h"
-#include "object_bridge_msgs/ObjectMerged.h"
-#include <ros/ros.h>
-#include <tf/transform_listener.h>
 
 namespace intelligent_ca
 {
+
 ObjectMerger::ObjectMerger() : nh_("~")
+{
+  ROS_ERROR("ENTER default ObjectMerger Constructor...");
+
+  detection_sub_ = nh_.subscribe(kTopicObjectDetection, 10, &ObjectMerger::onObjectDetected, this);
+  tracking_sub_ = nh_.subscribe(kTopicObjectTracking, 10, &ObjectMerger::onObjectTracked, this);
+  localization_sub_ = nh_.subscribe(kTopicObjectLocalization, 10, &ObjectMerger::onObjectLocalized, this);
+
+  /// We assume the maximum object detected in one camera frame is less than 10
+  /// We just store at most 2 frames of topics
+  // objects_detected_.reserve(10*2);
+  // objects_tracked_.reserve(10*2);
+  // objects_localized_.reserve(10*2);
+
+  // nh_.param<std::string>("base_frame", base_frame_, "/base_link");
+
+  // ros::ServiceServer service =
+  // nh_.advertiseService("obj_merger",&CaPolicy::mergeObjects);
+
+  frames_ = std::make_shared<Obstacles>(nh_);
+}
+
+ObjectMerger::ObjectMerger(ros::NodeHandle& nh) : nh_(nh)
 {
   ROS_ERROR("ENTER ObjectMerger Constructor...");
 
@@ -69,33 +88,35 @@ ObjectMerger::~ObjectMerger()
 
 void ObjectMerger::onObjectDetected(const ros_yolo_msgs::ObjectsInBoxesConstPtr& msg)
 {
-  //ROS_ERROR("RECEIVE Object Detection topic...");
-  ROS_WARN("RECEIVE Object Detection topic...");
-  std::shared_ptr<CaObjectFrame> frame = frames_->getInstance(msg->header.stamp, msg->header.frame_id);
+  if(true)
+  {
+    ROS_ERROR("RECEIVE Object Detection topic...");
+  }
 
-  frame->addVector(msg->objects_vector);
-
-  frames_->publish(frame);
   frames_->clearOldFrames();
+  frames_->addVector(msg->header.stamp, msg->header.frame_id, msg->objects_vector);
+
 }
 
 void ObjectMerger::onObjectTracked(const object_pipeline_msgs::TrackedObjectsConstPtr& msg)
 {
-  std::shared_ptr<CaObjectFrame> frame = frames_->getInstance(msg->header.stamp, msg->header.frame_id);
-
-  frame->addVector(msg->tracked_objects);
-  frames_->publish(frame);
   frames_->clearOldFrames();
+  frames_->addVector(msg->header.stamp, msg->header.frame_id, msg->tracked_objects);
+
   ROS_ERROR("RECEIVE Object Tracking topic...");
 }
 
 void ObjectMerger::onObjectLocalized(const object_pipeline_msgs::ObjectsInBoxes3DConstPtr& msg)
 {
-  std::shared_ptr<CaObjectFrame> frame = frames_->getInstance(msg->header.stamp, msg->header.frame_id);
+  /*std::shared_ptr<CaObjectFrame> frame = frames_->getInstance(msg->header.stamp, msg->header.frame_id);
 
   frame->addVector(msg->objects_in_boxes);
   frames_->publish(frame);
+  frames_->clearOldFrames();*/
+
   frames_->clearOldFrames();
+  frames_->addVector(msg->header.stamp, msg->header.frame_id, msg->objects_in_boxes);
+
 
   ROS_ERROR("RECEIVE Object Localization topic...");
 }

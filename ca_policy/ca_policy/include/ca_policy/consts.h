@@ -83,6 +83,7 @@ const std::string kTopicCaPolicy = "ca_policy";
 const std::string kTopicObjectsInFrame = "object_merged";
 const std::string kTopicSocialObjectInFrame = "social_object";
 
+//bool ica_debug_ = true;
 /**
 bool isEqual(const ObjectRoi& left, const ObjectRoi& right)
 {

@@ -30,21 +30,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
-#include "ca_policy/ca_policy.h"
-#include "ca_policy/object_merger.h"
 #include <ros/ros.h>
+#include "ca_policy/object_merger.h"
 
 using namespace intelligent_ca;
 
 int main(int argc, char** argv)
 {
-  ROS_INFO("ENTER ca_policy node.. ");
   ros::init(argc, argv, "ca_policy");
+  ros::NodeHandle node_handler("~");
 
   ROS_ERROR("ENTER ca_policy node. ");
   ROS_WARN("ENTER ca_policy node.. ");
   ROS_DEBUG("ENTER ca_policy node.. ");
 
-  ObjectMerger merger;
+  /** Only for Debug
+  ros::Rate loop_rate(2);
+  while(ros::ok())
+  {
+    ROS_ERROR("ERROR. ");
+    ROS_WARN("WARN.. ");
+    loop_rate.sleep();
+    ros::spinOnce();
+  }*/
+
+  ObjectMerger merger(node_handler);
+
   ros::spin();
 }

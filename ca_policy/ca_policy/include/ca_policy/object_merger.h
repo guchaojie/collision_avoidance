@@ -31,14 +31,12 @@
 #ifndef ICA_OBJECT_MERGER_H
 #define ICA_OBJECT_MERGER_H
 
-#include <math.h>
 #include <ros/ros.h>
 #include <vector>
 
 #include "ca_policy/ca_policy_manager.h"
 #include "ca_policy/consts.h"
 #include "ca_policy/obstacles.h"
-//#include "obstacles.h"
 
 namespace intelligent_ca
 {
@@ -54,7 +52,8 @@ class ObjectMerger
 {
 public:
   ObjectMerger();
-  ObjectMerger(const Obstacles* obstacles, const CaPolicyManager* manager);
+  ObjectMerger(ros::NodeHandle& nh);
+  //ObjectMerger(const Obstacles* obstacles, const CaPolicyManager* manager);
   virtual ~ObjectMerger();
 
 private:
@@ -76,12 +75,12 @@ private:
   //std::shared_ptr<Obstacles> pObstacle_;
   ros::NodeHandle nh_;
 
-  ros::Subscriber detection_sub_;    /// the subscriber of detection messages
-  ros::Subscriber tracking_sub_;     /// the subscriber of tracking messages
+  ros::Subscriber detection_sub_; /// the subscriber of detection messages
+  ros::Subscriber tracking_sub_; /// the subscriber of tracking messages
   ros::Subscriber localization_sub_; /// the subscriber of localization messages
 
   std::shared_ptr<Obstacles> frames_; /// the frames storing all obstacles' info
 };
 
-}  // namespace
+} // namespace
 #endif
