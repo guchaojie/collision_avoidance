@@ -120,7 +120,7 @@ void CaObjectFrame::addVector(const DetectionVector& vector)
   objects_detected_ = vector;
   mergeObjects();
   //std::cout << "THe detected objests: " << objects_detected_;
-  ROS_ERROR("size of  objests_detected: %d", objects_detected_.size());
+  ROS_ERROR("size of  objests_detected: %lu", objects_detected_.size());
 }
 
 void CaObjectFrame::addVector(const TrackingVector& vector)
@@ -183,7 +183,7 @@ void CaObjectFrame::mergeObjects()
         objects_merged_.push_back(merged_obj);
       }
     }
-    ROS_ERROR("size of objects_merged: %d", objects_merged_.size());
+    ROS_ERROR("size of objects_merged: %lu", objects_merged_.size());
 
   } // end of for(...)
   is_merging_ = false;

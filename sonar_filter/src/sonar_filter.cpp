@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2017-2018, Intel, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -43,7 +43,7 @@ namespace intelligent_ca {
 
 
   SonarFilter::SonarFilter()
-    : nh_("~"), listener_(ros::Duration(10)), 
+    : nh_("~"), listener_(ros::Duration(10)),
     last_sonar_data_(INVALID_SONAR_DATA), last_sonar_data_deprecated_(-1), count_index(0)
   {
     scan_filtered_pub_ = nh_.advertise<sensor_msgs::Range>("/water_uavcan_master/sonar_filtered", 1);
@@ -76,10 +76,10 @@ namespace intelligent_ca {
   {
     scan_filtered_pub_.publish(pub);
   }
-  
+
   bool SonarFilter::checkCorrectSonarDataAndSet(sensor_msgs::Range& data)
   {
-    float sum=0.0;
+    double sum=0.0;
 
     if (count_index < FILTER_NUMBER) {
       distance_array.push_back(data.range);
@@ -102,17 +102,7 @@ namespace intelligent_ca {
       return true;
     }
   }
-  
-  void SonarFilter::setPossibilityOfObstacle(float range)
-  {
-    range < OBSTACLE_DISTANCE_THRESHOLD? possibility_obstacle_ = POSSIBILITY_HIGH :
-      (range < last_sonar_data_? possibility_obstacle_ = POSSIBILITY_MED : possibility_obstacle_ = 
-      POSSIBILITY_LOW);
-  }
-  ObstaclePosibility SonarFilter::getPossibilityOfObstacle()
-  {
-    return possibility_obstacle_;
-  }
+
 } //namespace
 
 int main(int argc, char** argv)
