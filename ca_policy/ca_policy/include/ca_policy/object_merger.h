@@ -63,14 +63,14 @@ private:
   void onObjectDetected(const ros_yolo_msgs::ObjectsInBoxesConstPtr& msg);
 
   /** @brief Callback function when receiving messages from object_pipeline package.
-   *  @param[in] msg The received message (typed in object_pipeline_msgs::TrackedObjects)
+   *  @param[in] msg The received message (typed in object_analytics_msgs::TrackedObjects)
    */
-  void onObjectTracked(const object_pipeline_msgs::TrackedObjectsConstPtr& msg);
+  void onObjectTracked(const object_analytics_msgs::TrackedObjectsConstPtr& msg);
 
   /** @brief Callback function when receiving messages from object_pipeline package.
-   *  @param[in] msg The received message (typed in object_pipeline_msgs::ObjectsInBoxes3D)
+   *  @param[in] msg The received message (typed in object_analytics_msgs::ObjectsInBoxes3D)
    */
-  void onObjectLocalized(const object_pipeline_msgs::ObjectsInBoxes3DConstPtr& msg);
+  void onObjectLocalized(const object_analytics_msgs::ObjectsInBoxes3DConstPtr& msg);
 
   //std::shared_ptr<Obstacles> pObstacle_;
   ros::NodeHandle nh_;

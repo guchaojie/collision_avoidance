@@ -98,7 +98,7 @@ void ObjectMerger::onObjectDetected(const ros_yolo_msgs::ObjectsInBoxesConstPtr&
 
 }
 
-void ObjectMerger::onObjectTracked(const object_pipeline_msgs::TrackedObjectsConstPtr& msg)
+void ObjectMerger::onObjectTracked(const object_analytics_msgs::TrackedObjectsConstPtr& msg)
 {
   frames_->clearOldFrames();
   frames_->addVector(msg->header.stamp, msg->header.frame_id, msg->tracked_objects);
@@ -106,7 +106,7 @@ void ObjectMerger::onObjectTracked(const object_pipeline_msgs::TrackedObjectsCon
   ROS_ERROR("RECEIVE Object Tracking topic...");
 }
 
-void ObjectMerger::onObjectLocalized(const object_pipeline_msgs::ObjectsInBoxes3DConstPtr& msg)
+void ObjectMerger::onObjectLocalized(const object_analytics_msgs::ObjectsInBoxes3DConstPtr& msg)
 {
   /*std::shared_ptr<CaObjectFrame> frame = frames_->getInstance(msg->header.stamp, msg->header.frame_id);
 

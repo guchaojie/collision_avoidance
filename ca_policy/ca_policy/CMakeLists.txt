@@ -5,7 +5,7 @@ add_definitions(-std=c++11)
 
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs
-		object_pipeline_msgs
+		object_analytics_msgs
 		object_bridge_msgs
 		ros_yolo_msgs
 		ca_policy_msgs
