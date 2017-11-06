@@ -111,8 +111,8 @@ void CaObjectFrame::initParameter()
 void CaObjectFrame::addVector(const DetectionVector& vector)
 {
   ROS_ERROR("add detection vector ... ");
-  int i = 0;
-  /*for (auto obj : vector)
+  /*int i = 0;
+  for (auto obj : vector)
    {
    ROS_ERROR("... Object %d", i++);
    objects_detected_.push_back(obj);
@@ -159,12 +159,11 @@ void CaObjectFrame::mergeObjects()
   for (DetectionVector::iterator it = objects_detected_.begin(); it != objects_detected_.end(); ++it)
   {
     ObjectRoi roi = it->roi;
-    bool result = false;
     MergedObject merged_obj;
     TrackingObjectInBox track_obj;
     LocalizationObjectInBox loc_obj;
 
-    result = findTrackingObjectByRoi(roi, track_obj);
+    bool result = findTrackingObjectByRoi(roi, track_obj);
     if (result)
     {
       ROS_ERROR("...Found Tracking Objects.");
