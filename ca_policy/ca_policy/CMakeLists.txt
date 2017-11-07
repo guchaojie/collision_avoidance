@@ -35,7 +35,7 @@ add_executable(ca_policy
   )
 target_link_libraries(ca_policy ${catkin_LIBRARIES})
 #add_dependencies(ca_policy ${PROJECT_NAME}_gencfg)
-add_dependencies(ca_policy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(ca_policy ${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 
 #############
 ## Install ##
