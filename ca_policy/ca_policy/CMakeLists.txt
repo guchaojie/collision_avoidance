@@ -7,7 +7,7 @@ add_definitions(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs
 		object_analytics_msgs
 		object_bridge_msgs
-		ros_yolo_msgs
+		object_msgs
 		ca_policy_msgs
 		)
 
@@ -16,7 +16,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs
 
 # What other packages will need to use this package
 catkin_package(
-    CATKIN_DEPENDS roscpp sensor_msgs std_msgs geometry_msgs object_analytics_msgs ros_yolo_msgs
+    CATKIN_DEPENDS roscpp sensor_msgs std_msgs geometry_msgs object_analytics_msgs object_msgs
 )
 
 ###########

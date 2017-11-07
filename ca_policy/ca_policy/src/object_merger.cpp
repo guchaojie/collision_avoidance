@@ -86,7 +86,7 @@ ObjectMerger::~ObjectMerger()
 {
 }
 
-void ObjectMerger::onObjectDetected(const ros_yolo_msgs::ObjectsInBoxesConstPtr& msg)
+void ObjectMerger::onObjectDetected(const object_msgs::ObjectsInBoxesConstPtr& msg)
 {
   if(true)
   {

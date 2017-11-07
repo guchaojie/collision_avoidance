@@ -57,10 +57,10 @@ public:
   virtual ~ObjectMerger();
 
 private:
-  /** @brief Callback function when receiving messages from ros_yolo package.
-   *  @param[in] msg The received message (typed in ros_yolo_msgs::ObjectsInBoxes)
+  /** @brief Callback function when receiving messages from AMR_ros_object_msgs package.
+   *  @param[in] msg The received message (typed in object_msgs::ObjectsInBoxes)
    */
-  void onObjectDetected(const ros_yolo_msgs::ObjectsInBoxesConstPtr& msg);
+  void onObjectDetected(const object_msgs::ObjectsInBoxesConstPtr& msg);
 
   /** @brief Callback function when receiving messages from object_pipeline package.
    *  @param[in] msg The received message (typed in object_analytics_msgs::TrackedObjects)
