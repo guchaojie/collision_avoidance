@@ -16,7 +16,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs
 
 # What other packages will need to use this package
 catkin_package(
-    CATKIN_DEPENDS roscpp sensor_msgs std_msgs geometry_msgs
+    CATKIN_DEPENDS roscpp sensor_msgs std_msgs geometry_msgs object_analytics_msgs ros_yolo_msgs
 )
 
 ###########
