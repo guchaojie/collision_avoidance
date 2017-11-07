@@ -97,6 +97,10 @@ void CaObjectFrame::initParameter()
   nh_.param("merged_op_msg_enabled", merged_op_msg_enabled_, true);
 
   is_merging_ = false;
+
+  /**< @todo TODO: get params for social_filter_ */
+  social_filter_.clear();
+  social_filter_.push_back("person");
   /*server_ = new dynamic_reconfigure::Server<ca_policy1::CaObjectFrameConfig>(nh_);
    cb_reconfigure_ = boost::bind(&CaObjectFrame::configure, this, _1, _2);
    server_->setCallback(cb_reconfigure_);*/
@@ -298,6 +302,19 @@ bool CaObjectFrame::publish()
     setFlagPublished(true);
 
     return true;
+  }
+
+  return false;
+}
+
+bool CaObjectFrame::isSocialObject(MergedObject& ob)
+{
+  for (auto f : social_filter_)
+  {
+    if (ob.type.find(f) != std::string::npos)
+    {
+      return true;
+    }
   }
 
   return false;
