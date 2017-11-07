@@ -97,6 +97,10 @@ void CaObjectFrame::initParameter()
   nh_.param("merged_op_msg_enabled", merged_op_msg_enabled_, true);
 
   is_merging_ = false;
+
+  /**< @todo TODO: get params for social_filter_ */
+  social_filter_.clear();
+  social_filter_.push_back("person");
   /*server_ = new dynamic_reconfigure::Server<ca_policy1::CaObjectFrameConfig>(nh_);
    cb_reconfigure_ = boost::bind(&CaObjectFrame::configure, this, _1, _2);
    server_->setCallback(cb_reconfigure_);*/
@@ -111,8 +115,8 @@ void CaObjectFrame::initParameter()
 void CaObjectFrame::addVector(const DetectionVector& vector)
 {
   ROS_ERROR("add detection vector ... ");
-  int i = 0;
-  /*for (auto obj : vector)
+  /*int i = 0;
+  for (auto obj : vector)
    {
    ROS_ERROR("... Object %d", i++);
    objects_detected_.push_back(obj);
@@ -120,7 +124,7 @@ void CaObjectFrame::addVector(const DetectionVector& vector)
   objects_detected_ = vector;
   mergeObjects();
   //std::cout << "THe detected objests: " << objects_detected_;
-  ROS_ERROR("size of  objests_detected: %d", objects_detected_.size());
+  ROS_ERROR("size of  objests_detected: %lu", objects_detected_.size());
 }
 
 void CaObjectFrame::addVector(const TrackingVector& vector)
@@ -159,12 +163,11 @@ void CaObjectFrame::mergeObjects()
   for (DetectionVector::iterator it = objects_detected_.begin(); it != objects_detected_.end(); ++it)
   {
     ObjectRoi roi = it->roi;
-    bool result = false;
     MergedObject merged_obj;
     TrackingObjectInBox track_obj;
     LocalizationObjectInBox loc_obj;
 
-    result = findTrackingObjectByRoi(roi, track_obj);
+    bool result = findTrackingObjectByRoi(roi, track_obj);
     if (result)
     {
       ROS_ERROR("...Found Tracking Objects.");
@@ -183,7 +186,7 @@ void CaObjectFrame::mergeObjects()
         objects_merged_.push_back(merged_obj);
       }
     }
-    ROS_ERROR("size of objects_merged: %d", objects_merged_.size());
+    ROS_ERROR("size of objects_merged: %lu", objects_merged_.size());
 
   } // end of for(...)
   is_merging_ = false;
@@ -299,6 +302,19 @@ bool CaObjectFrame::publish()
     setFlagPublished(true);
 
     return true;
+  }
+
+  return false;
+}
+
+bool CaObjectFrame::isSocialObject(MergedObject& ob)
+{
+  for (auto f : social_filter_)
+  {
+    if (ob.type.find(f) != std::string::npos)
+    {
+      return true;
+    }
   }
 
   return false;

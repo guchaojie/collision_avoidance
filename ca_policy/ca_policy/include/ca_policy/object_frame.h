@@ -142,10 +142,8 @@ public:
    *  2. Robot base
    *  @param[in] ob The merged object (from object pipeline) to be checked.
    *  @return true if the given object is in social type, otherwise false.
-   *
-   *  @todo, TODO, currently any Merged Object is looked as social object, so simply return true;
    */
-  static bool isSocialObject(MergedObject& ob) {return true;};
+  bool isSocialObject(MergedObject& ob) ;
 
 private:
   // void publishObjectsInGroup();
@@ -197,6 +195,8 @@ private:
   //dynamic_reconfigure::Server<ca_policy1::CaObjectFrameConfig>::CallbackType cb_reconfigure_;
 
   bool is_merging_;
+
+  std::vector<std::string> social_filter_; //filter strings for social messages
 };
 
 }  // namespace

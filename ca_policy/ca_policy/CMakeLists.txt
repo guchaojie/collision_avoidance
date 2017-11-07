@@ -5,18 +5,18 @@ add_definitions(-std=c++11)
 
 # Load catkin and all dependencies required for this package
 find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs
-		object_pipeline_msgs
+		object_analytics_msgs
 		object_bridge_msgs
-		ros_yolo_msgs
+		object_msgs
 		ca_policy_msgs
-		dynamic_reconfigure)
+		)
 
 ## dynamic reconfigure config
 #generate_dynamic_reconfigure_options(cfg/CaObjectFrame.cfg)
 
 # What other packages will need to use this package
 catkin_package(
-    CATKIN_DEPENDS roscpp sensor_msgs std_msgs dynamic_reconfigure geometry_msgs
+    CATKIN_DEPENDS roscpp sensor_msgs std_msgs geometry_msgs object_analytics_msgs object_msgs
 )
 
 ###########
@@ -34,7 +34,8 @@ add_executable(ca_policy
   src/obstacles.cpp
   )
 target_link_libraries(ca_policy ${catkin_LIBRARIES})
-add_dependencies(ca_policy ${PROJECT_NAME}_gencfg)
+#add_dependencies(ca_policy ${PROJECT_NAME}_gencfg)
+add_dependencies(ca_policy ${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 
 #############
 ## Install ##

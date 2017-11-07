@@ -57,20 +57,20 @@ public:
   virtual ~ObjectMerger();
 
 private:
-  /** @brief Callback function when receiving messages from ros_yolo package.
-   *  @param[in] msg The received message (typed in ros_yolo_msgs::ObjectsInBoxes)
+  /** @brief Callback function when receiving messages from AMR_ros_object_msgs package.
+   *  @param[in] msg The received message (typed in object_msgs::ObjectsInBoxes)
    */
-  void onObjectDetected(const ros_yolo_msgs::ObjectsInBoxesConstPtr& msg);
+  void onObjectDetected(const object_msgs::ObjectsInBoxesConstPtr& msg);
 
   /** @brief Callback function when receiving messages from object_pipeline package.
-   *  @param[in] msg The received message (typed in object_pipeline_msgs::TrackedObjects)
+   *  @param[in] msg The received message (typed in object_analytics_msgs::TrackedObjects)
    */
-  void onObjectTracked(const object_pipeline_msgs::TrackedObjectsConstPtr& msg);
+  void onObjectTracked(const object_analytics_msgs::TrackedObjectsConstPtr& msg);
 
   /** @brief Callback function when receiving messages from object_pipeline package.
-   *  @param[in] msg The received message (typed in object_pipeline_msgs::ObjectsInBoxes3D)
+   *  @param[in] msg The received message (typed in object_analytics_msgs::ObjectsInBoxes3D)
    */
-  void onObjectLocalized(const object_pipeline_msgs::ObjectsInBoxes3DConstPtr& msg);
+  void onObjectLocalized(const object_analytics_msgs::ObjectsInBoxes3DConstPtr& msg);
 
   //std::shared_ptr<Obstacles> pObstacle_;
   ros::NodeHandle nh_;

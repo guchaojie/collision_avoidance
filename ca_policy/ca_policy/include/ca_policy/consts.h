@@ -34,13 +34,13 @@
 #include <ros/ros.h>
 #include <vector>
 //#include <sensor_msgs/people.h>
-#include <object_pipeline_msgs/ObjectInBox3D.h>
-#include <object_pipeline_msgs/ObjectsInBoxes3D.h>
-#include <object_pipeline_msgs/TrackedObject.h>
-#include <object_pipeline_msgs/TrackedObjects.h>
-#include <ros_yolo_msgs/Object.h>
-#include <ros_yolo_msgs/ObjectInBox.h>
-#include <ros_yolo_msgs/ObjectsInBoxes.h>
+#include <object_analytics_msgs/ObjectInBox3D.h>
+#include <object_analytics_msgs/ObjectsInBoxes3D.h>
+#include <object_analytics_msgs/TrackedObject.h>
+#include <object_analytics_msgs/TrackedObjects.h>
+#include <object_msgs/Object.h>
+#include <object_msgs/ObjectInBox.h>
+#include <object_msgs/ObjectsInBoxes.h>
 
 #include <object_bridge_msgs/ObjectMerged.h>
 #include <object_bridge_msgs/ObjectsInFrameMerged.h>
@@ -48,14 +48,14 @@
 
 namespace intelligent_ca
 {
-using DetectionObject = ros_yolo_msgs::Object;
-using DetectionObjectInBox = ros_yolo_msgs::ObjectInBox;
-using TrackingObjectInBox = object_pipeline_msgs::TrackedObject;
-using LocalizationObjectInBox = object_pipeline_msgs::ObjectInBox3D;
+using DetectionObject = object_msgs::Object;
+using DetectionObjectInBox = object_msgs::ObjectInBox;
+using TrackingObjectInBox = object_analytics_msgs::TrackedObject;
+using LocalizationObjectInBox = object_analytics_msgs::ObjectInBox3D;
 
-using DetectionMsg = ros_yolo_msgs::ObjectsInBoxes;
-using TrackingMsg = object_pipeline_msgs::TrackedObjects;
-using LocalizationMsg = object_pipeline_msgs::ObjectsInBoxes3D;
+using DetectionMsg = object_msgs::ObjectsInBoxes;
+using TrackingMsg = object_analytics_msgs::TrackedObjects;
+using LocalizationMsg = object_analytics_msgs::ObjectsInBoxes3D;
 
 using DetectionVector = std::vector<DetectionObjectInBox>;
 using TrackingVector = std::vector<TrackingObjectInBox>;

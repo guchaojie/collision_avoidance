@@ -1,13 +1,13 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
-* 
+*
 *  Copyright (c) 2017-2018, Intel, Inc.
 *  All rights reserved.
-* 
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions
 *  are met:
-* 
+*
 *   * Redistributions of source code must retain the above copyright
 *     notice, this list of conditions and the following disclaimer.
 *   * Redistributions in binary form must reproduce the above
@@ -17,7 +17,7 @@
 *   * Neither the name of the Willow Garage nor the names of its
 *     contributors may be used to endorse or promote products derived
 *     from this software without specific prior written permission.
-* 
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
@@ -43,43 +43,41 @@
 namespace intelligent_ca {
 
 const int FILTER_NUMBER = 10;
-  
+
   enum ObstaclePosibility {
     POSSIBILITY_LOW,
     POSSIBILITY_MED,
     POSSIBILITY_HIGH
   };
-  
+
   const float INVALID_SONAR_DATA = -1000.0;
-  
+
   ///@brief distance threshold of the distance. Unit:meter.
   const float OBSTACLE_DISTANCE_THRESHOLD = 0.25;
-    
+
 class SonarFilter
 {
 public:
   SonarFilter();
   void update(const sensor_msgs::Range& input_scan);
-  
+
 private:
   bool checkCorrectSonarDataAndSet(sensor_msgs::Range& data);
   void publishSonarData(const sensor_msgs::Range& pub);
-  void setPossibilityOfObstacle(float range);
-  ObstaclePosibility getPossibilityOfObstacle();
-  
+
   ros::NodeHandle nh_;
   tf::TransformListener listener_;
   std::string base_frame_;
   ros::Publisher scan_filtered_pub_;
   ros::Subscriber scan_sub_;
-  
-  /** 
+
+  /**
    * @brief The last correct sonar data
    */
   float last_sonar_data_;
-  
-  /** 
-   * @brief The last deprecated sonar data, which is far away (>sonar_dist_tolerance_) from the 
+
+  /**
+   * @brief The last deprecated sonar data, which is far away (>sonar_dist_tolerance_) from the
    l ast correct data.      *
    */
   float last_sonar_data_deprecated_;
