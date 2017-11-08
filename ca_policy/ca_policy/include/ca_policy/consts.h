@@ -45,6 +45,7 @@
 #include <object_bridge_msgs/ObjectMerged.h>
 #include <object_bridge_msgs/ObjectsInFrameMerged.h>
 #include <object_bridge_msgs/SocialObject.h>
+#include <object_bridge_msgs/SocialObjectsInFrame.h>
 
 namespace intelligent_ca
 {
@@ -52,19 +53,20 @@ using DetectionObject = object_msgs::Object;
 using DetectionObjectInBox = object_msgs::ObjectInBox;
 using TrackingObjectInBox = object_analytics_msgs::TrackedObject;
 using LocalizationObjectInBox = object_analytics_msgs::ObjectInBox3D;
+using MergedObject = object_bridge_msgs::ObjectMerged;
+using SocialObject = object_bridge_msgs::SocialObject;
 
 using DetectionMsg = object_msgs::ObjectsInBoxes;
 using TrackingMsg = object_analytics_msgs::TrackedObjects;
 using LocalizationMsg = object_analytics_msgs::ObjectsInBoxes3D;
+using ObjectMergedMsg = object_bridge_msgs::ObjectsInFrameMerged;
+using SocialObjectsInFrameMsg = object_bridge_msgs::SocialObjectsInFrame;
 
 using DetectionVector = std::vector<DetectionObjectInBox>;
 using TrackingVector = std::vector<TrackingObjectInBox>;
 using LocalizationVector = std::vector<LocalizationObjectInBox>;
-
-using MergedObject = object_bridge_msgs::ObjectMerged;
 using ObjectMergedVector = std::vector<MergedObject>;
-using ObjectMergedMsg = object_bridge_msgs::ObjectsInFrameMerged;
-using SocialObjectMsg = object_bridge_msgs::SocialObject;
+using SoicalObjectVector = std::vector<SocialObject>;
 
 using ObjectRoi = sensor_msgs::RegionOfInterest;
 

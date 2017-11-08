@@ -14,6 +14,7 @@ add_message_files(
    ObjectMerged.msg
    ObjectMergedStamped.msg
    ObjectsInFrameMerged.msg
+   SocialObjectsInFrame.msg
 )
 
 generate_messages(
