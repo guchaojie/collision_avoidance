@@ -2,3 +2,6 @@
 # obstacles parameters
 max_frames: 30
 
+#posibility threshold to accept an object
+posibility_threshold: 0.7
+

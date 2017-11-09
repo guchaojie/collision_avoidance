@@ -96,6 +96,7 @@ void CaObjectFrame::initParameter()
 {
   nh_.param("social_msg_enabled", social_msg_enabled_, true);
   nh_.param("merged_op_msg_enabled", merged_op_msg_enabled_, true);
+  nh_.param("posibility_threshold", posibility_threshold_, 0.1);
 
   is_merging_ = false;
 
@@ -163,6 +164,10 @@ void CaObjectFrame::mergeObjects()
   is_merging_ = true;
   for (DetectionVector::iterator it = objects_detected_.begin(); it != objects_detected_.end(); ++it)
   {
+    if(it->object.probability < posibility_threshold_){
+      continue;
+    }
+
     ObjectRoi roi = it->roi;
     MergedObject merged_obj;
     TrackingObjectInBox track_obj;

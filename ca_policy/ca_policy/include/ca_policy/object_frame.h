@@ -191,6 +191,7 @@ private:
 
   bool social_msg_enabled_;
   bool merged_op_msg_enabled_;
+  double posibility_threshold_;
   //dynamic_reconfigure::Server<ca_policy1::CaObjectFrameConfig>* server_;
   //dynamic_reconfigure::Server<ca_policy1::CaObjectFrameConfig>::CallbackType cb_reconfigure_;
 

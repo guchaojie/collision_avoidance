@@ -68,23 +68,13 @@ ObjectMerger::ObjectMerger(ros::NodeHandle& nh) : nh_(nh)
   tracking_sub_ = nh_.subscribe(kTopicObjectTracking, 10, &ObjectMerger::onObjectTracked, this);
   localization_sub_ = nh_.subscribe(kTopicObjectLocalization, 10, &ObjectMerger::onObjectLocalized, this);
 
-  /// We assume the maximum object detected in one camera frame is less than 10
-  /// We just store at most 2 frames of topics
-  // objects_detected_.reserve(10*2);
-  // objects_tracked_.reserve(10*2);
-  // objects_localized_.reserve(10*2);
-
-  // nh_.param<std::string>("base_frame", base_frame_, "/base_link");
-
-  // ros::ServiceServer service =
-  // nh_.advertiseService("obj_merger",&CaPolicy::mergeObjects);
-
   frames_ = std::make_shared<Obstacles>(nh_);
 }
 
 ObjectMerger::~ObjectMerger()
 {
 }
+
 
 void ObjectMerger::onObjectDetected(const object_msgs::ObjectsInBoxesConstPtr& msg)
 {
