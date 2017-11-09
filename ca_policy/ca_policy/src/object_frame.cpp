@@ -38,6 +38,7 @@
 #include "ca_policy/object_frame.h"
 #include <object_bridge_msgs/ObjectMerged.h>
 #include <object_bridge_msgs/SocialObject.h>
+#include <object_bridge_msgs/SocialObjectsInFrame.h>
 
 namespace intelligent_ca
 {
@@ -45,7 +46,7 @@ CaObjectFrame::CaObjectFrame() :
     nh_("/intelligent_ca/"), published_(false)
 {
   merged_objects_pub_ = nh_.advertise<object_bridge_msgs::ObjectsInFrameMerged>(kTopicObjectsInFrame, 1);
-  social_object_pub_ = nh_.advertise<object_bridge_msgs::SocialObject>(kTopicSocialObjectInFrame, 1);
+  social_object_pub_ = nh_.advertise<object_bridge_msgs::SocialObjectsInFrame>(kTopicSocialObjectInFrame, 1);
 
   initParameter();
 
@@ -60,7 +61,7 @@ CaObjectFrame::CaObjectFrame(ros::NodeHandle nh) :
     nh_(nh), published_(false)
 {
   merged_objects_pub_ = nh_.advertise<object_bridge_msgs::ObjectsInFrameMerged>(kTopicObjectsInFrame, 1);
-  social_object_pub_ = nh_.advertise<object_bridge_msgs::SocialObject>(kTopicSocialObjectInFrame, 1);
+  social_object_pub_ = nh_.advertise<object_bridge_msgs::SocialObjectsInFrame>(kTopicSocialObjectInFrame, 1);
 
   initParameter();
 
@@ -75,7 +76,7 @@ CaObjectFrame::CaObjectFrame(ros::Time& stamp, std::string& frame_id, ros::NodeH
     nh_(nh), published_(false)
 {
   merged_objects_pub_ = nh_.advertise<object_bridge_msgs::ObjectsInFrameMerged>(kTopicObjectsInFrame, 1);
-  social_object_pub_ = nh_.advertise<object_bridge_msgs::SocialObject>(kTopicSocialObjectInFrame, 1);
+  social_object_pub_ = nh_.advertise<object_bridge_msgs::SocialObjectsInFrame>(kTopicSocialObjectInFrame, 1);
 
   initParameter();
 
@@ -95,6 +96,7 @@ void CaObjectFrame::initParameter()
 {
   nh_.param("social_msg_enabled", social_msg_enabled_, true);
   nh_.param("merged_op_msg_enabled", merged_op_msg_enabled_, true);
+  nh_.param("posibility_threshold", posibility_threshold_, 0.1);
 
   is_merging_ = false;
 
@@ -116,7 +118,7 @@ void CaObjectFrame::addVector(const DetectionVector& vector)
 {
   ROS_ERROR("add detection vector ... ");
   /*int i = 0;
-  for (auto obj : vector)
+   for (auto obj : vector)
    {
    ROS_ERROR("... Object %d", i++);
    objects_detected_.push_back(obj);
@@ -162,6 +164,10 @@ void CaObjectFrame::mergeObjects()
   is_merging_ = true;
   for (DetectionVector::iterator it = objects_detected_.begin(); it != objects_detected_.end(); ++it)
   {
+    if(it->object.probability < posibility_threshold_){
+      continue;
+    }
+
     ObjectRoi roi = it->roi;
     MergedObject merged_obj;
     TrackingObjectInBox track_obj;
@@ -278,26 +284,36 @@ bool CaObjectFrame::publish()
 
     if (social_msg_enabled_)
     {
-      SocialObjectMsg msg;
-      msg.header.frame_id = tf_frame_id_;
-      msg.header.stamp = stamp_;
+
+      SoicalObjectVector socials;
+      socials.clear();
       for (auto ob : objects_merged_)
       {
         if (isSocialObject(ob))
         {
-          msg.name = ob.type;
+          SocialObject so;
+          so.id = ob.id;
+          so.name = ob.type;
           geometry_msgs::Point32 c = getCentroid(ob);
-          msg.position.x = c.x;
-          msg.position.y = c.y;
-          msg.position.z = c.z;
-          msg.velocity = ob.velocity;
-          msg.reliability = ob.probability;
-          msg.tagnames.clear(); /**< Not used */
-          msg.tags.clear(); /**< Not used */
-          social_object_pub_.publish(msg);
+          so.position.x = c.x;
+          so.position.y = c.y;
+          so.position.z = c.z;
+          so.velocity = ob.velocity;
+          so.reliability = ob.probability;
+          so.tagnames.clear(); /**< Not used */
+          so.tags.clear(); /**< Not used */
+          socials.push_back(so);
         }
       }
+      if (!socials.empty())
+      {
+        SocialObjectsInFrameMsg msg;
+        msg.header.frame_id = tf_frame_id_;
+        msg.header.stamp = stamp_;
+        msg.objects = socials;
 
+        social_object_pub_.publish(msg);
+      }
     }
     setFlagPublished(true);
 
