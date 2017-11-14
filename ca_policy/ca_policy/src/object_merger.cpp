@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ros/ros.h>
 #include <vector>
+#include <message_filters/subscriber.h>
+#include <message_filters/time_synchronizer.h>
 
 #include "ca_policy/object_merger.h"
 
@@ -42,40 +44,53 @@ ObjectMerger::ObjectMerger() : nh_("~")
 {
   ROS_ERROR("ENTER default ObjectMerger Constructor...");
 
-  detection_sub_ = nh_.subscribe(kTopicObjectDetection, 10, &ObjectMerger::onObjectDetected, this);
-  tracking_sub_ = nh_.subscribe(kTopicObjectTracking, 10, &ObjectMerger::onObjectTracked, this);
-  localization_sub_ = nh_.subscribe(kTopicObjectLocalization, 10, &ObjectMerger::onObjectLocalized, this);
-
-  /// We assume the maximum object detected in one camera frame is less than 10
-  /// We just store at most 2 frames of topics
-  // objects_detected_.reserve(10*2);
-  // objects_tracked_.reserve(10*2);
-  // objects_localized_.reserve(10*2);
-
-  // nh_.param<std::string>("base_frame", base_frame_, "/base_link");
-
-  // ros::ServiceServer service =
-  // nh_.advertiseService("obj_merger",&CaPolicy::mergeObjects);
-
-  frames_ = std::make_shared<Obstacles>(nh_);
+  onInit();
 }
 
 ObjectMerger::ObjectMerger(ros::NodeHandle& nh) : nh_(nh)
 {
   ROS_ERROR("ENTER ObjectMerger Constructor...");
 
-  detection_sub_ = nh_.subscribe(kTopicObjectDetection, 10, &ObjectMerger::onObjectDetected, this);
-  tracking_sub_ = nh_.subscribe(kTopicObjectTracking, 10, &ObjectMerger::onObjectTracked, this);
-  localization_sub_ = nh_.subscribe(kTopicObjectLocalization, 10, &ObjectMerger::onObjectLocalized, this);
+  onInit();
+}
+
+void ObjectMerger::onInit()
+{
+  nh_.param("msg_object_detection", msg_object_detection_, kTopicObjectDetection);
+  nh_.param("msg_object_tracking", msg_object_tracking_, kTopicObjectTracking);
+  nh_.param("msg_object_localization", msg_object_localization_, kTopicObjectLocalization);
+
+  message_filters::Subscriber<DetectionMsg> detection_sub(nh_, msg_object_detection_, 1);
+  message_filters::Subscriber<TrackingMsg> tracking_sub(nh_, msg_object_tracking_, 1);
+  message_filters::Subscriber<LocalizationMsg> localization_sub(nh_, msg_object_localization_, 1);
+  message_filters::TimeSynchronizer<DetectionMsg, TrackingMsg, LocalizationMsg> sync(detection_sub, tracking_sub, localization_sub, 10);
+  sync.registerCallback(boost::bind(&ObjectMerger::onObjectsReceived,this, _1, _2, _3));
 
   frames_ = std::make_shared<Obstacles>(nh_);
+  ROS_ERROR("message_detction:%s, tracking:%s, localization:%s", msg_object_detection_.c_str(),
+            msg_object_tracking_.c_str(), msg_object_localization_.c_str());
 }
 
 ObjectMerger::~ObjectMerger()
 {
 }
 
+void ObjectMerger::onObjectsReceived(const object_msgs::ObjectsInBoxesConstPtr& detect,
+                                    const object_analytics_msgs::TrackedObjectsConstPtr& track,
+                                    const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc)
+{
+  ROS_ERROR("ENTER onObjectsReceived");
+  if(loc->objects_in_boxes.size()==0 || track->tracked_objects.size()==0 || detect->objects_vector.size()==0
+      || loc->header.frame_id != track->header.frame_id || track->header.frame_id != detect->header.frame_id
+      || loc->header.frame_id != detect->header.frame_id)
+  {
+    return;
+  }
 
+
+  frames_->processFrame(detect, track, loc);
+
+}
 void ObjectMerger::onObjectDetected(const object_msgs::ObjectsInBoxesConstPtr& msg)
 {
   if(true)

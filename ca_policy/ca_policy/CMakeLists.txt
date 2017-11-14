@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs
 		object_bridge_msgs
 		object_msgs
 		ca_policy_msgs
+		message_filters
 		)
 
 ## dynamic reconfigure config
@@ -16,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs
 
 # What other packages will need to use this package
 catkin_package(
-    CATKIN_DEPENDS roscpp sensor_msgs std_msgs geometry_msgs object_analytics_msgs object_msgs
+    CATKIN_DEPENDS roscpp sensor_msgs std_msgs geometry_msgs object_analytics_msgs object_msgs message_filters
 )
 
 ###########
