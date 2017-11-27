@@ -47,6 +47,8 @@
 #include <object_bridge_msgs/SocialObject.h>
 #include <object_bridge_msgs/SocialObjectsInFrame.h>
 
+#include <ca_policy_msgs/CaPolicy.h>
+
 namespace intelligent_ca
 {
 using DetectionObject = object_msgs::Object;

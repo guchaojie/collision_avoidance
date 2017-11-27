@@ -30,20 +30,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
+#include <boost/thread/thread.hpp>
+#include <vector>
+
 #include <ros/ros.h>
-#include "ca_policy/object_merger.h"
+#include "ca_policy/ca_policy.h"
+#include "ca_policy/ca_policy_social.h"
 
-using namespace intelligent_ca;
-
-int main(int argc, char** argv)
+namespace intelligent_ca
 {
-  ros::init(argc, argv, "object_merger");
-  ros::NodeHandle node_handler("~");
-
-  ROS_ERROR("ENTER ca_policy node. ");
-
-
-  ObjectMerger merger(node_handler);
-
-  ros::spin();
+SocialCaPolicy::SocialCaPolicy() : CaPolicy()
+{
 }
+
+SocialCaPolicy::SocialCaPolicy(const std::string& name, const std::string& config) : CaPolicy(name, config)
+{
+}
+
+SocialCaPolicy::~SocialCaPolicy()
+{
+}
+
+void SocialCaPolicy::execute()
+{
+  ROS_INFO("executing Social CA policy ...");
+
+  /**< @todo TODO: reconfig navigation stack with config file*/
+  executeReconfig();
+
+  /**< @todo TODO: turn off robot LED */
+  executeLED("flashing");
+}
+
+}  // namespace

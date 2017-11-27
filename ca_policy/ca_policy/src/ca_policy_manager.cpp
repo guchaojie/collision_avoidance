@@ -50,9 +50,10 @@ CaPolicyManager::CaPolicyManager()
 
 CaPolicyManager::~CaPolicyManager()
 {
+  policies_.clear();
 }
 
-bool CaPolicyManager::addPolicy(const std::string name, const CaPolicy& policy)
+bool CaPolicyManager::addPolicy(const std::string name, const std::shared_ptr<CaPolicy>& policy)
 {
   try{
     CaPolicyVector::iterator exist;
@@ -107,6 +108,10 @@ bool CaPolicyManager::findPolicy(const std::string name, CaPolicyVector::iterato
   return false;
 }
 
+std::string CaPolicyManager::getCurrentPolicy()
+{
+  return std::get<0>(current_policy_);
+}
 bool CaPolicyManager::setCurrentPolicy(const std::string name)
 {
 
@@ -117,6 +122,7 @@ bool CaPolicyManager::setCurrentPolicy(const std::string name)
     current_policy_ = *exist;
 
     ///@TODO: talk with Navigation stack here
+    std::get<1>(current_policy_)->execute();
 
     return true;
   }
