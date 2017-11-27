@@ -37,6 +37,7 @@
 #include <vector>
 
 #include "object_frame.h"
+#include "ca_policy/consts.h"
 
 namespace intelligent_ca
 {
@@ -48,6 +49,12 @@ public:
   Obstacles();
   Obstacles(ros::NodeHandle nh);
   virtual ~Obstacles();
+
+  void processFrame(const object_msgs::ObjectsInBoxesConstPtr& detect,
+                    const object_analytics_msgs::TrackedObjectsConstPtr& track,
+                    const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc);
+
+  void calcVelocity(CaObjectFrame& frame);
 
   /** @brief Search and return the instance of a frame by the given frame_id and time stamp.
    *         If no cached instance, create a new one and return it.

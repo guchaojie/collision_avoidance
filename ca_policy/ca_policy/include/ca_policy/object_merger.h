@@ -57,6 +57,11 @@ public:
   virtual ~ObjectMerger();
 
 private:
+  void onInit(void);
+
+  void onObjectsReceived(const object_msgs::ObjectsInBoxesConstPtr& detect,
+                                      const object_analytics_msgs::TrackedObjectsConstPtr& track,
+                                      const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc);
   /** @brief Callback function when receiving messages from AMR_ros_object_msgs package.
    *  @param[in] msg The received message (typed in object_msgs::ObjectsInBoxes)
    */
@@ -80,6 +85,11 @@ private:
   ros::Subscriber localization_sub_; /// the subscriber of localization messages
 
   std::shared_ptr<Obstacles> frames_; /// the frames storing all obstacles' info
+
+  /**< Object Messages, which are initialized from parameter configurer.*/
+  std::string msg_object_detection_;
+  std::string msg_object_tracking_;
+  std::string msg_object_localization_;
 };
 
 } // namespace
