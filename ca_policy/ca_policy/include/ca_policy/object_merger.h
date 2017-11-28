@@ -33,6 +33,8 @@
 
 #include <ros/ros.h>
 #include <vector>
+#include <message_filters/subscriber.h>
+#include <message_filters/time_synchronizer.h>
 
 #include "ca_policy/ca_policy_manager.h"
 #include "ca_policy/consts.h"
@@ -90,6 +92,16 @@ private:
   std::string msg_object_detection_;
   std::string msg_object_tracking_;
   std::string msg_object_localization_;
+
+  using FilteredDetection = message_filters::Subscriber<DetectionMsg>;
+  using FilteredTracking = message_filters::Subscriber<TrackingMsg>;
+  using FilteredLocalization = message_filters::Subscriber<LocalizationMsg>;
+  using FilteredSync = message_filters::TimeSynchronizer<DetectionMsg, TrackingMsg, LocalizationMsg>;
+
+  std::unique_ptr<FilteredDetection>    f_detection_sub_;
+  std::unique_ptr<FilteredTracking>     f_tracking_sub_;
+  std::unique_ptr<FilteredLocalization> f_localization_sub_;
+  std::unique_ptr<FilteredSync>         sync_sub_;
 };
 
 } // namespace

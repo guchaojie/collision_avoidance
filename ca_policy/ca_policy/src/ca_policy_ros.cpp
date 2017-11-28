@@ -52,21 +52,22 @@ CaPolicyRos::~CaPolicyRos()
 
 void CaPolicyRos::init()
 {
-  if (!node_handler_.hasParam("policies"))
+  if (!node_handler_.hasParam("CaPolicies"))
   {
     ROS_ERROR("No policies are set in parameter file. EXIT!");
     return;
   }
   XmlRpc::XmlRpcValue my_list;
-  node_handler_.getParam("plugins", my_list);
+  node_handler_.getParam("CaPolicies", my_list);
   for (int32_t i = 0; i < my_list.size(); ++i)
   {
     std::string pname = static_cast<std::string>(my_list[i]["name"]);
     std::string config = static_cast<std::string>(my_list[i]["config"]);
-    ROS_INFO("Using plugin \"%s\"", pname.c_str());
+    ROS_INFO("Using CA Policy \"%s:%s\"", pname.c_str(), config.c_str());
+    ROS_ERROR("Using CA Policy \"%s:%s\"", pname.c_str(), config.c_str());
 
     // CaPolicy policy(pname, config);
-    std::shared_ptr<CaPolicy> policy = policy_builder_.createInstance("pname");
+    std::shared_ptr<CaPolicy> policy = policy_builder_.createInstance(pname);
     policy->setConfiguration(config);
     policy_manager_.addPolicy(pname, policy);
   }
@@ -75,7 +76,7 @@ void CaPolicyRos::init()
   vision_obj_sub_ = node_handler_.subscribe(kTopicSocialObjectInFrame, 10, &CaPolicyRos::onObjectReceived, this);
   ca_policy_pub_ = node_handler_.advertise < ca_policy_msgs::CaPolicy > (kTopicCaPolicy, 1);
 
-  node_handler_.param("max_detection_distance", max_detection_distance_, 2.0);
+  node_handler_.param("max_detection_distance", max_detection_distance_, 5.0);
   node_handler_.param("min_interval", min_interval_, 10.0);
 }
 void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFrameConstPtr& msg)

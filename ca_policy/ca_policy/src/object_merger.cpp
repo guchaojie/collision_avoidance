@@ -60,11 +60,11 @@ void ObjectMerger::onInit()
   nh_.param("msg_object_tracking", msg_object_tracking_, kTopicObjectTracking);
   nh_.param("msg_object_localization", msg_object_localization_, kTopicObjectLocalization);
 
-  message_filters::Subscriber<DetectionMsg> detection_sub(nh_, msg_object_detection_, 1);
-  message_filters::Subscriber<TrackingMsg> tracking_sub(nh_, msg_object_tracking_, 1);
-  message_filters::Subscriber<LocalizationMsg> localization_sub(nh_, msg_object_localization_, 1);
-  message_filters::TimeSynchronizer<DetectionMsg, TrackingMsg, LocalizationMsg> sync(detection_sub, tracking_sub, localization_sub, 10);
-  sync.registerCallback(boost::bind(&ObjectMerger::onObjectsReceived,this, _1, _2, _3));
+  f_detection_sub_ = std::unique_ptr<FilteredDetection>(new FilteredDetection(nh_, msg_object_detection_, 1));
+  f_tracking_sub_ = std::unique_ptr<FilteredTracking>(new FilteredTracking(nh_, msg_object_tracking_, 1));
+  f_localization_sub_ = std::unique_ptr<FilteredLocalization>(new FilteredLocalization(nh_, msg_object_localization_, 1));
+  sync_sub_ = std::unique_ptr<FilteredSync>( new FilteredSync(*f_detection_sub_, *f_tracking_sub_, *f_localization_sub_, 10));
+  sync_sub_->registerCallback(boost::bind(&ObjectMerger::onObjectsReceived,this, _1, _2, _3));
 
   frames_ = std::make_shared<Obstacles>(nh_);
   ROS_ERROR("message_detction:%s, tracking:%s, localization:%s", msg_object_detection_.c_str(),
@@ -74,6 +74,7 @@ void ObjectMerger::onInit()
 ObjectMerger::~ObjectMerger()
 {
 }
+
 
 void ObjectMerger::onObjectsReceived(const object_msgs::ObjectsInBoxesConstPtr& detect,
                                     const object_analytics_msgs::TrackedObjectsConstPtr& track,
@@ -86,7 +87,6 @@ void ObjectMerger::onObjectsReceived(const object_msgs::ObjectsInBoxesConstPtr& 
   {
     return;
   }
-
 
   frames_->processFrame(detect, track, loc);
 

@@ -60,10 +60,12 @@ bool CaPolicyManager::addPolicy(const std::string name, const std::shared_ptr<Ca
     bool found = findPolicy(name, exist);
     if (found)
     {
+      ROS_ERROR("Policy %s already exist, update it with new content.", name.c_str());
       std::get<1>(*exist) = policy;
       return true;
     }
 
+    ROS_ERROR("Create new policy %s ...", name.c_str());
     CaPolicyPair pair = std::make_pair(name, policy);
     policies_.push_back(pair);
     return true;

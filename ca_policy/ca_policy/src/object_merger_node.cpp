@@ -37,10 +37,10 @@ using namespace intelligent_ca;
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "object_merger");
+  ros::init(argc, argv, "vision_object");
   ros::NodeHandle node_handler("~");
 
-  ROS_ERROR("ENTER ca_policy node. ");
+  ROS_ERROR("ENTER vision_object node. ");
 
 
   ObjectMerger merger(node_handler);

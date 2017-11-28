@@ -40,7 +40,7 @@ using namespace intelligent_ca;
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "ca_policy");
-  ros::NodeHandle node_handler("~/CaPolicy");
+  ros::NodeHandle node_handler("~");
 
   ROS_ERROR("ENTER ca_policy node. ");
 
