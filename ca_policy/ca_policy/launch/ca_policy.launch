@@ -1,9 +1,15 @@
 <launch>
 
-  <!-- ca_policy -->
+  <!-- vision object -->
+ 
+  <node pkg="ca_policy" name="vision_object" type="vision_object" >
+    <rosparam file="$(find ca_policy)/param/vision_object.yaml" command="load" />
+  </node>
+
+  
+  <!-- ca policy -->
   <node pkg="ca_policy" name="ca_policy" type="ca_policy" >
     <rosparam file="$(find ca_policy)/param/ca_policy.yaml" command="load" />
   </node>
-
 </launch>
 

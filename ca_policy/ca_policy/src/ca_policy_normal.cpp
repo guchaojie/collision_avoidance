@@ -31,19 +31,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *******************************************************************************/
 
 #include <ros/ros.h>
-#include "ca_policy/object_merger.h"
+#include "ca_policy/ca_policy.h"
+#include "ca_policy/ca_policy_normal.h"
 
-using namespace intelligent_ca;
-
-int main(int argc, char** argv)
+namespace intelligent_ca
 {
-  ros::init(argc, argv, "vision_object");
-  ros::NodeHandle node_handler("~");
-
-  ROS_ERROR("ENTER vision_object node. ");
-
-
-  ObjectMerger merger(node_handler);
-
-  ros::spin();
+NormalCaPolicy::NormalCaPolicy() : CaPolicy()
+{
 }
+
+NormalCaPolicy::NormalCaPolicy(const std::string& name, const std::string& config) : CaPolicy(name, config)
+{
+}
+
+NormalCaPolicy::~NormalCaPolicy()
+{
+}
+
+void NormalCaPolicy::execute()
+{
+  ROS_INFO("executing Normal CA policy ...");
+
+  /**< @todo TODO: reconfig navigation stack with config file*/
+  executeReconfig();
+
+  /**< @todo TODO: turn off robot LED */
+  executeLED("flashing");
+}
+
+}  // namespace

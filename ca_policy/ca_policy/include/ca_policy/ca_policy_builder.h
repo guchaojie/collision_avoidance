@@ -28,58 +28,36 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-#ifndef ICA_CA_POLICY_MANAGER_H
-#define ICA_CA_POLICY_MANAGER_H
+#ifndef ICA_CA_POLICY_BUILDER_H
+#define ICA_CA_POLICY_BUILDER_H
 
 #include <ros/ros.h>
 #include <vector>
 
-#include "ca_policy.h"
-#include <ca_policy/ca_policy.h>
+#include "ca_policy/ca_policy.h"
+#include "ca_policy/ca_policy_social.h"
+#include "ca_policy/ca_policy_normal.h"
 
 namespace intelligent_ca
 {
-using CaPolicyPair = std::pair<std::string, std::shared_ptr<CaPolicy>>;
-using CaPolicyVector = std::vector<CaPolicyPair>;
 
 /** @brief This class manages the CA policies in use.
  * add, delete, set policy name, set current policy.
  */
-class CaPolicyManager
+class CaPolicyBuilder
 {
 public:
-  CaPolicyManager();
-  virtual ~CaPolicyManager();
+  CaPolicyBuilder(){};
+  virtual ~CaPolicyBuilder(){};
 
-  /** @brief add CA policy by the given name and policy instance.
-   *  @param[in] name   The name of the policy to be added.
-   *  @param[in] policy Policy to be added.
-   *  @return true if successfully added, otherwise false.
-   */
-  bool addPolicy(const std::string name, const std::shared_ptr<CaPolicy>& policy);
+  std::shared_ptr<CaPolicy> createInstance(const std::string name)
+  {
+    if(name == "social")
+      return std::make_shared<SocialCaPolicy>();
 
-  /** @brief delete CA policy by the give policy name.
-   *  @param[in] name The name of the policy to be deleted.
-   *  @return true if successfully deleted, otherwise false.
-   */
-  bool deletePolicy(const std::string name);
+    return std::make_shared<NormalCaPolicy>();
+  }
 
-  // CaPolicy getPolicyByName(const std::string name);
-
-  std::string getCurrentPolicy();
-  bool setCurrentPolicy(const std::string name);
-
-private:
-
-  /** @brief Search and return the CA policy by the given name.
-   *  @param[in] name The name of the policy to be searched.
-   *  @param[out] pair The iterator of the policy found.
-   *  @return true if found, otherwise false.
-   */
-  bool findPolicy(const std::string name, CaPolicyVector::iterator& pair);
-
-  CaPolicyVector policies_; ///@brief CA policy list
-  CaPolicyPair current_policy_; ///@brief The working CA policy, which is used to configure navigation.
 };
 
 }  // namespace
