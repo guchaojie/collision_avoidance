@@ -48,6 +48,9 @@ public:
   CaPolicy(const std::string& name, const std::string& config);
   virtual ~CaPolicy();
 
+  /** @brief execute the policy*/
+  virtual void execute(){};
+
   /** @brief set policy's configuration file.
    *  @param[in] config the config file path to be set to the Ca Policy.
    *  @return    true if successfully set, otherwise false.
@@ -70,7 +73,10 @@ public:
    */
   std::string getPolicyName();
 
-private:
+  virtual void executeReconfig(){};
+  virtual void executeLED(std::string type){};
+
+protected:
   // ros::NodeHandle nh_;
   std::string config_file_;  ///@brief configuration file path
   std::string name_;         ///@brief CA Policy name, "safety", "robot", "normal" would be current option.

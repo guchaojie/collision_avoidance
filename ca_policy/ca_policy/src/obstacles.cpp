@@ -55,6 +55,57 @@ Obstacles::~Obstacles()
 {
 }
 
+void Obstacles::calcVelocity(CaObjectFrame& frame)
+{
+  std::vector<CaObjectFrame> frames = frames_;
+  unsigned int size_frames = frames.size();
+  ROS_ERROR("Caculating VELOCITY (total %d frames...", size_frames);
+  for (ObjectMergedVector::iterator ob = frame.getMergedObjects().begin(); ob != frame.getMergedObjects().end(); ++ob)
+  {
+    ROS_ERROR("....process Object.");
+    geometry_msgs::Point sum_vel;
+    int sum_count = 0;
+    sum_vel.x = sum_vel.y = sum_vel.z = 0.0;
+
+    /**< Find the latest objects from frames (in reverse order) */
+    for (unsigned int i = size_frames; i > 0; --i)
+    {
+
+      double duration = frames[i - 1].getStamp().toSec() - frame.getStamp().toSec();
+      if (duration == 0.0)
+      {
+        continue;
+      }
+      ROS_ERROR("......compare with other frames...");
+      MergedObject out;
+      if (frames[i - 1].findMergedObjectById(ob->id, out))
+      {
+        ROS_ERROR("Finding the VEL Candidate");
+        geometry_msgs::Point32 from = CaObjectFrame::getCentroid(*ob);
+        geometry_msgs::Point32 to = CaObjectFrame::getCentroid(out);
+        double distance_x = to.x - from.x;
+        double distance_y = to.y - from.y;
+        double distance_z = to.z - from.z;
+
+        /**< @todo, double check it is set correctly */
+        sum_vel.x += distance_x / duration;
+        sum_vel.y += distance_y / duration;
+        sum_vel.z += distance_z / duration;
+        sum_count++;
+        break;
+      }
+    }
+    /**< @todo, double check it is set correctly */
+    if (sum_count > 0)
+    {
+      ROS_ERROR("Setting velocity...");
+      ob->velocity.x = sum_vel.x / sum_count;
+      ob->velocity.y = sum_vel.y / sum_count;
+      ob->velocity.z = sum_vel.z / sum_count;
+    }
+  }
+}
+
 void Obstacles::calcVelocity(std::vector<CaObjectFrame>::iterator& frame)
 {
   //ObjectMergedVector objects = frame->getMergedObjects();
@@ -122,6 +173,29 @@ void Obstacles::publish(std::vector<CaObjectFrame>::iterator& frame)
   ROS_ERROR("ENTER Obstacles::publish");
   calcVelocity(frame);
   frame->publish();
+}
+void Obstacles::processFrame(const object_msgs::ObjectsInBoxesConstPtr& detect,
+                          const object_analytics_msgs::TrackedObjectsConstPtr& track,
+                          const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc)
+{
+  /**< make sure old frames are already cleared first. */
+  clearOldFrames();
+
+  ros::Time stamp = detect->header.stamp;
+  std::string frame_id = detect->header.frame_id;
+
+  CaObjectFrame new_frame(stamp, frame_id, nh_);
+  new_frame.addVector(detect->objects_vector);
+  new_frame.addVector(track->tracked_objects);
+  new_frame.addVector(loc->objects_in_boxes);
+  bool velocity_enabled;
+  nh_.param("velocity_enabled", velocity_enabled, true);
+  if(velocity_enabled)
+  {
+    calcVelocity(new_frame);
+  }
+  new_frame.publish();
+  frames_.push_back(new_frame);
 }
 void Obstacles::addVector(ros::Time stamp, std::string frame_id, const DetectionVector& vector)
 {

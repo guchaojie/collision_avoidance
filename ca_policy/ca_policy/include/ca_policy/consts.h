@@ -47,6 +47,8 @@
 #include <object_bridge_msgs/SocialObject.h>
 #include <object_bridge_msgs/SocialObjectsInFrame.h>
 
+#include <ca_policy_msgs/CaPolicy.h>
+
 namespace intelligent_ca
 {
 using DetectionObject = object_msgs::Object;
@@ -83,7 +85,7 @@ const std::string kTopicObjectLocalization = "/object_pipeline/localization";
 
 const std::string kTopicCaPolicy = "ca_policy";
 const std::string kTopicObjectsInFrame = "object_merged";
-const std::string kTopicSocialObjectInFrame = "social_object";
+const std::string kTopicSocialObjectInFrame = "/vision_object/social_object";
 
 //bool ica_debug_ = true;
 /**
