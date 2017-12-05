@@ -46,4 +46,6 @@ int main(int argc, char** argv)
   ObjectMerger merger(node_handler);
 
   ros::spin();
+
+  return(0);
 }
