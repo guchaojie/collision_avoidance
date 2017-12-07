@@ -25,4 +25,6 @@
   <include file="$(find water_navigation)/launch/includes/move_base.slave.launch.xml" />
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find waterrobot_cartographer)/rviz/waterrobot.rviz" />
 	
+<!-- CA Policy -->
+  <include file="$(find ca_policy)/launch/ca_policy.launch"/>
 </launch>
