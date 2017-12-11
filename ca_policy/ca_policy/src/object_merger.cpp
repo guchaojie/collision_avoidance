@@ -42,14 +42,14 @@ namespace intelligent_ca
 
 ObjectMerger::ObjectMerger() : nh_("~")
 {
-  ROS_ERROR("ENTER default ObjectMerger Constructor...");
+  ROS_INFO("ENTER default ObjectMerger Constructor...");
 
   onInit();
 }
 
 ObjectMerger::ObjectMerger(ros::NodeHandle& nh) : nh_(nh)
 {
-  ROS_ERROR("ENTER ObjectMerger Constructor...");
+  ROS_INFO("ENTER ObjectMerger Constructor...");
 
   onInit();
 }
@@ -67,7 +67,7 @@ void ObjectMerger::onInit()
   sync_sub_->registerCallback(boost::bind(&ObjectMerger::onObjectsReceived,this, _1, _2, _3));
 
   frames_ = std::make_shared<Obstacles>(nh_);
-  ROS_ERROR("message_detction:%s, tracking:%s, localization:%s", msg_object_detection_.c_str(),
+  ROS_INFO("message_detction:%s, tracking:%s, localization:%s", msg_object_detection_.c_str(),
             msg_object_tracking_.c_str(), msg_object_localization_.c_str());
 }
 
@@ -80,7 +80,6 @@ void ObjectMerger::onObjectsReceived(const object_msgs::ObjectsInBoxesConstPtr& 
                                     const object_analytics_msgs::TrackedObjectsConstPtr& track,
                                     const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc)
 {
-  ROS_ERROR("ENTER onObjectsReceived");
   if(loc->objects_in_boxes.size()==0 || track->tracked_objects.size()==0 || detect->objects_vector.size()==0
       || loc->header.frame_id != track->header.frame_id || track->header.frame_id != detect->header.frame_id
       || loc->header.frame_id != detect->header.frame_id)
@@ -90,40 +89,6 @@ void ObjectMerger::onObjectsReceived(const object_msgs::ObjectsInBoxesConstPtr& 
 
   frames_->processFrame(detect, track, loc);
 
-}
-void ObjectMerger::onObjectDetected(const object_msgs::ObjectsInBoxesConstPtr& msg)
-{
-  if(true)
-  {
-    ROS_ERROR("RECEIVE Object Detection topic...");
-  }
-
-  frames_->clearOldFrames();
-  frames_->addVector(msg->header.stamp, msg->header.frame_id, msg->objects_vector);
-
-}
-
-void ObjectMerger::onObjectTracked(const object_analytics_msgs::TrackedObjectsConstPtr& msg)
-{
-  frames_->clearOldFrames();
-  frames_->addVector(msg->header.stamp, msg->header.frame_id, msg->tracked_objects);
-
-  ROS_ERROR("RECEIVE Object Tracking topic...");
-}
-
-void ObjectMerger::onObjectLocalized(const object_analytics_msgs::ObjectsInBoxes3DConstPtr& msg)
-{
-  /*std::shared_ptr<CaObjectFrame> frame = frames_->getInstance(msg->header.stamp, msg->header.frame_id);
-
-  frame->addVector(msg->objects_in_boxes);
-  frames_->publish(frame);
-  frames_->clearOldFrames();*/
-
-  frames_->clearOldFrames();
-  frames_->addVector(msg->header.stamp, msg->header.frame_id, msg->objects_in_boxes);
-
-
-  ROS_ERROR("RECEIVE Object Localization topic...");
 }
 
 }  // namespace

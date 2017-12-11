@@ -42,7 +42,7 @@ namespace intelligent_ca
 CaPolicyRos::CaPolicyRos(ros::NodeHandle& nh) :
     node_handler_(nh), last_set_time_(0)
 {
-  ROS_ERROR("ENTER CaPolicyRos Constructor...");
+  ROS_INFO("ENTER CaPolicyRos Constructor...");
   init();
 }
 
@@ -54,7 +54,7 @@ void CaPolicyRos::init()
 {
   if (!node_handler_.hasParam("CaPolicies"))
   {
-    ROS_ERROR("No policies are set in parameter file. EXIT!");
+    ROS_INFO("No policies are set in parameter file. EXIT!");
     return;
   }
   XmlRpc::XmlRpcValue my_list;
@@ -64,7 +64,7 @@ void CaPolicyRos::init()
     std::string pname = static_cast<std::string>(my_list[i]["name"]);
     std::string config = static_cast<std::string>(my_list[i]["config"]);
     ROS_INFO("Using CA Policy \"%s:%s\"", pname.c_str(), config.c_str());
-    ROS_ERROR("Using CA Policy \"%s:%s\"", pname.c_str(), config.c_str());
+    ROS_INFO("Using CA Policy \"%s:%s\"", pname.c_str(), config.c_str());
 
     // CaPolicy policy(pname, config);
     std::shared_ptr<CaPolicy> policy = policy_builder_.createInstance(pname);
@@ -79,11 +79,12 @@ void CaPolicyRos::init()
   node_handler_.param("max_detection_distance", max_detection_distance_, 5.0);
   node_handler_.param("min_interval", min_interval_, 10.0);
 }
+
 void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFrameConstPtr& msg)
 {
   if (true)
   {
-    ROS_ERROR("RECEIVE Object SocialObjectsInFrameConstPtr topic...");
+    ROS_INFO("RECEIVE Object SocialObjectsInFrameConstPtr topic...");
   }
 
   ros::Time now = ros::Time::now();

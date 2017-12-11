@@ -103,30 +103,14 @@ void CaObjectFrame::initParameter()
   /**< @todo TODO: get params for social_filter_ */
   social_filter_.clear();
   social_filter_.push_back("person");
-  /*server_ = new dynamic_reconfigure::Server<ca_policy1::CaObjectFrameConfig>(nh_);
-   cb_reconfigure_ = boost::bind(&CaObjectFrame::configure, this, _1, _2);
-   server_->setCallback(cb_reconfigure_);*/
 }
-/*
- void CaObjectFrame::configure(ca_policy1::CaObjectFrameConfig &config, uint32_t level)
- {
- social_msg_enabled_ = config.social_msg_enabled;
- merged_op_msg_enabled_ = config.merged_op_msg_enabled;
- }*/
 
 void CaObjectFrame::addVector(const DetectionVector& vector)
 {
-  ROS_ERROR("add detection vector ... ");
-  /*int i = 0;
-   for (auto obj : vector)
-   {
-   ROS_ERROR("... Object %d", i++);
-   objects_detected_.push_back(obj);
-   }*/
+  ROS_INFO("add detection vector ... ");
   objects_detected_ = vector;
   mergeObjects();
-  //std::cout << "THe detected objests: " << objects_detected_;
-  ROS_ERROR("size of  objests_detected: %lu", objects_detected_.size());
+  ROS_INFO("size of  objests_detected: %lu", objects_detected_.size());
 }
 
 void CaObjectFrame::addVector(const TrackingVector& vector)
@@ -149,18 +133,18 @@ void CaObjectFrame::mergeObjects()
 {
   if (is_merging_)
   {
-    ROS_ERROR("Objects is already merging...");
+    ROS_INFO("Objects is already merging...");
     return;
   }
 
-  ROS_ERROR("published:%s, data ready:%s", published_ ? "true" : "false", isDataReady() ? "true" : "false");
+  ROS_INFO("published:%s, data ready:%s", published_ ? "true" : "false", isDataReady() ? "true" : "false");
   if (published_ || !isDataReady())
   {
     ROS_WARN("Already published or data not ready. Do nothing");
     return;
   }
 
-  ROS_ERROR("MERGING...");
+  ROS_INFO("MERGING...");
   is_merging_ = true;
   for (DetectionVector::iterator it = objects_detected_.begin(); it != objects_detected_.end(); ++it)
   {
@@ -176,11 +160,11 @@ void CaObjectFrame::mergeObjects()
     bool result = findTrackingObjectByRoi(roi, track_obj);
     if (result)
     {
-      ROS_ERROR("...Found Tracking Objects.");
+      ROS_INFO("...Found Tracking Objects.");
       result = findLocalizationObjectByRoi(roi, loc_obj);
       if (result)
       {
-        ROS_ERROR("...Found Localization Objects.");
+        ROS_INFO("...Found Localization Objects.");
         merged_obj.min = loc_obj.min;
         merged_obj.max = loc_obj.max;
         merged_obj.id = track_obj.id;
@@ -192,11 +176,12 @@ void CaObjectFrame::mergeObjects()
         objects_merged_.push_back(merged_obj);
       }
     }
-    ROS_ERROR("size of objects_merged: %lu", objects_merged_.size());
+    ROS_INFO("size of objects_merged: %lu", objects_merged_.size());
 
   } // end of for(...)
   is_merging_ = false;
 }
+
 bool CaObjectFrame::findMergedObjectById(const int id, MergedObject& out)
 {
   ObjectMergedVector temp_objects = objects_merged_;
@@ -204,13 +189,14 @@ bool CaObjectFrame::findMergedObjectById(const int id, MergedObject& out)
   {
     if (t.id == id)
     {
-      ROS_ERROR("<<<Finding merged objects by ID...>");
+      ROS_INFO("<<<Finding merged objects by ID...>");
       out = t;
       return true;
     }
   }
   return false;
 }
+
 bool CaObjectFrame::findMergedObjectByRoi(const ObjectRoi& roi, MergedObject& out)
 {
   ObjectMergedVector temp_objects = objects_merged_;
@@ -220,7 +206,7 @@ bool CaObjectFrame::findMergedObjectByRoi(const ObjectRoi& roi, MergedObject& ou
     if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width
         && roi.height == t.roi.height)
     {
-      ROS_ERROR("<<<Finding merged objects by ROI...>");
+      ROS_INFO("<<<Finding merged objects by ROI...>");
       out = t;
       return true;
     }
@@ -262,17 +248,17 @@ bool CaObjectFrame::findLocalizationObjectByRoi(const ObjectRoi& roi, Localizati
 
 bool CaObjectFrame::publish()
 {
-  ROS_ERROR("ENTER CaObjectFrame::publish(): merged_op_msg_enabled_=%s, social_msg_enabled_=%s",
+  ROS_INFO("ENTER CaObjectFrame::publish(): merged_op_msg_enabled_=%s, social_msg_enabled_=%s",
             merged_op_msg_enabled_ ? "true" : "false", social_msg_enabled_ ? "true" : "false");
   if (published_)
   {
-    ROS_ERROR("Merged objects have been already published, do nothing");
+    ROS_INFO("Merged objects have been already published, do nothing");
     return false;
   }
 
   if (!objects_merged_.empty())
   {
-    ROS_ERROR("not EMPTY!!!");
+    ROS_INFO("not EMPTY!!!");
     if (merged_op_msg_enabled_)
     {
       ObjectMergedMsg msg;
