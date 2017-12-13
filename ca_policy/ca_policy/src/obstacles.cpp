@@ -42,6 +42,8 @@ Obstacles::Obstacles(ros::NodeHandle nh) :
 {
   frames_.clear();
   nh_.param("max_frames", max_frames_, kDefaultMaxFrames);
+  nh_.param("velocity_enabled", velocity_enabled, true);
+
 }
 
 Obstacles::Obstacles() :
@@ -49,6 +51,7 @@ Obstacles::Obstacles() :
 {
   frames_.clear();
   nh_.param("max_frames", max_frames_, kDefaultMaxFrames);
+  nh_.param("velocity_enabled", velocity_enabled, true);
 }
 
 Obstacles::~Obstacles()
@@ -57,12 +60,14 @@ Obstacles::~Obstacles()
 
 void Obstacles::calcVelocity(CaObjectFrame& frame)
 {
+  if (!velocity_enabled)
+    return;
+
   std::vector<CaObjectFrame> frames = frames_;
   unsigned int size_frames = frames.size();
   ROS_INFO("Caculating VELOCITY (total %d frames...", size_frames);
   for (ObjectMergedVector::iterator ob = frame.getMergedObjects().begin(); ob != frame.getMergedObjects().end(); ++ob)
   {
-    ROS_INFO("....process Object.");
     geometry_msgs::Point sum_vel;
     int sum_count = 0;
     sum_vel.x = sum_vel.y = sum_vel.z = 0.0;
@@ -76,11 +81,10 @@ void Obstacles::calcVelocity(CaObjectFrame& frame)
       {
         continue;
       }
-      ROS_INFO("......compare with other frames...");
+
       MergedObject out;
       if (frames[i - 1].findMergedObjectById(ob->id, out))
       {
-        ROS_INFO("Finding the VEL Candidate");
         geometry_msgs::Point32 from = CaObjectFrame::getCentroid(*ob);
         geometry_msgs::Point32 to = CaObjectFrame::getCentroid(out);
         double distance_x = to.x - from.x;
@@ -98,7 +102,6 @@ void Obstacles::calcVelocity(CaObjectFrame& frame)
     /**< @todo, double check it is set correctly */
     if (sum_count > 0)
     {
-      ROS_INFO("Setting velocity...");
       ob->velocity.x = sum_vel.x / sum_count;
       ob->velocity.y = sum_vel.y / sum_count;
       ob->velocity.z = sum_vel.z / sum_count;
@@ -127,17 +130,19 @@ void Obstacles::processFrame(const object_msgs::ObjectsInBoxesConstPtr& detect,
   std::string frame_id = detect->header.frame_id;
 
   CaObjectFrame new_frame(stamp, frame_id, nh_);
-  new_frame.addVector(detect->objects_vector);
-  new_frame.addVector(track->tracked_objects);
-  new_frame.addVector(loc->objects_in_boxes);
-  bool velocity_enabled;
-  nh_.param("velocity_enabled", velocity_enabled, true);
-  if(velocity_enabled)
-  {
+
+  if (loc->objects_in_boxes.size() != 0 &&
+      track->tracked_objects.size() != 0 &&
+      detect->objects_vector.size() != 0) {
+    new_frame.addVector(detect->objects_vector);
+    new_frame.addVector(track->tracked_objects);
+    new_frame.addVector(loc->objects_in_boxes);
     calcVelocity(new_frame);
+
+    frames_.push_back(new_frame);
   }
+  
   new_frame.publish();
-  frames_.push_back(new_frame);
 }
 
 std::shared_ptr<CaObjectFrame> Obstacles::getInstance(ros::Time stamp, std::string frame_id)

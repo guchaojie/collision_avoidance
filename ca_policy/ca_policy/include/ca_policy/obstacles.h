@@ -87,6 +87,7 @@ public:
 private:
   std::vector<CaObjectFrame> frames_;
   int max_frames_;  /**< The number of frames to be archived in memory. */
+  bool velocity_enabled;
   ros::NodeHandle nh_;
 };
 

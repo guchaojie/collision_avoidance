@@ -248,35 +248,30 @@ bool CaObjectFrame::findLocalizationObjectByRoi(const ObjectRoi& roi, Localizati
 
 bool CaObjectFrame::publish()
 {
-  ROS_INFO("ENTER CaObjectFrame::publish(): merged_op_msg_enabled_=%s, social_msg_enabled_=%s",
-            merged_op_msg_enabled_ ? "true" : "false", social_msg_enabled_ ? "true" : "false");
-  if (published_)
-  {
+  if (published_) {
     ROS_INFO("Merged objects have been already published, do nothing");
     return false;
   }
 
-  if (!objects_merged_.empty())
-  {
-    ROS_INFO("not EMPTY!!!");
-    if (merged_op_msg_enabled_)
-    {
-      ObjectMergedMsg msg;
-      msg.header.frame_id = tf_frame_id_;
-      msg.header.stamp = stamp_;
-      msg.objects = objects_merged_;
-      merged_objects_pub_.publish(msg);
-    }
+  if (merged_op_msg_enabled_) {
+    ObjectMergedMsg msg;
+    msg.header.frame_id = tf_frame_id_;
+    msg.header.stamp = stamp_;
+    msg.objects = objects_merged_;
+    merged_objects_pub_.publish(msg);
+  }
 
-    if (social_msg_enabled_)
-    {
+  if (social_msg_enabled_) {
 
       SoicalObjectVector socials;
       socials.clear();
-      for (auto ob : objects_merged_)
-      {
-        if (isSocialObject(ob))
+
+      if (!objects_merged_.empty()) {
+        for (auto ob : objects_merged_)
         {
+          if (!isSocialObject(ob))
+            break;
+
           SocialObject so;
           so.id = ob.id;
           so.name = ob.type;
@@ -289,24 +284,19 @@ bool CaObjectFrame::publish()
           so.tagnames.clear(); /**< Not used */
           so.tags.clear(); /**< Not used */
           socials.push_back(so);
-        }
+        } 
       }
-      if (!socials.empty())
-      {
-        SocialObjectsInFrameMsg msg;
-        msg.header.frame_id = tf_frame_id_;
-        msg.header.stamp = stamp_;
-        msg.objects = socials;
 
-        social_object_pub_.publish(msg);
-      }
-    }
-    setFlagPublished(true);
+      SocialObjectsInFrameMsg msg;
+      msg.header.frame_id = tf_frame_id_;
+      msg.header.stamp = stamp_;
+      msg.objects = socials;
+      social_object_pub_.publish(msg);
+   }
 
-    return true;
-  }
+   setFlagPublished(true);
 
-  return false;
+   return true;
 }
 
 bool CaObjectFrame::isSocialObject(MergedObject& ob)

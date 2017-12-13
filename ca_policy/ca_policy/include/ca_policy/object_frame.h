@@ -83,11 +83,6 @@ public:
    */
   bool isDataReady()
   {
-    ROS_INFO("Data Ready ==detection:%s==tracking:%s==localization:%s",
-              objects_detected_.empty()?"false":"true",
-                  objects_tracked_.empty()?"false":"true",
-                      objects_localized_.empty()?"false":"true"
-    );
     return !objects_detected_.empty() && !objects_tracked_.empty() && !objects_localized_.empty();
   };
 

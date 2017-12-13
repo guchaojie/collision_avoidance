@@ -82,21 +82,21 @@ void CaPolicyRos::init()
 
 void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFrameConstPtr& msg)
 {
-  if (true)
-  {
-    ROS_INFO("RECEIVE Object SocialObjectsInFrameConstPtr topic...");
-  }
+  ROS_INFO("RECEIVE Object SocialObjectsInFrameConstPtr topic...");
 
   ros::Time now = ros::Time::now();
   bool social = false;
-  for (auto obj : msg->objects)
-  {
-    geometry_msgs::Point p = obj.position;
-    if (sqrt(p.x * p.x + p.y * p.y + p.z * p.z) < max_detection_distance_)
+
+  if (!msg->objects.empty()) {
+    for (auto obj : msg->objects)
     {
-      social = true;
-      break;
-    }
+       geometry_msgs::Point p = obj.position;
+       if ((sqrt(p.x * p.x + p.y * p.y + p.z * p.z) < max_detection_distance_) &&
+         obj.name == "person") {
+         social = true;
+         break;
+       }
+    } 
   }
 
   ca_policy_msgs::CaPolicy pmsg;
@@ -105,7 +105,7 @@ void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFram
   pmsg.robot_id = 0;
 
   double duration = now.toSec() - last_set_time_.toSec();
-  if (social && policy_manager_.getCurrentPolicy() != "social" && duration > min_interval_)
+  if (social && policy_manager_.getCurrentPolicy() != "social")
   {
     policy_manager_.setCurrentPolicy("social");
     last_set_time_ = now;
@@ -116,7 +116,7 @@ void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFram
 
   }
 
-  if (!social && policy_manager_.getCurrentPolicy() != "normal" && duration > min_interval_)
+  if (!social && policy_manager_.getCurrentPolicy() != "normal")
   {
     policy_manager_.setCurrentPolicy("normal");
     last_set_time_ = now;
