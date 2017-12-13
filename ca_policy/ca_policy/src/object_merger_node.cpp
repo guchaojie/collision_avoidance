@@ -40,7 +40,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "vision_object");
   ros::NodeHandle node_handler("~");
 
-  ROS_ERROR("ENTER vision_object node. ");
+  ROS_INFO("ENTER vision_object node. ");
 
 
   ObjectMerger merger(node_handler);

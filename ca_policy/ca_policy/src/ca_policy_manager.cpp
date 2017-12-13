@@ -60,24 +60,24 @@ bool CaPolicyManager::addPolicy(const std::string name, const std::shared_ptr<Ca
     bool found = findPolicy(name, exist);
     if (found)
     {
-      ROS_ERROR("Policy %s already exist, update it with new content.", name.c_str());
+      ROS_INFO("Policy %s already exist, update it with new content.", name.c_str());
       std::get<1>(*exist) = policy;
       return true;
     }
 
-    ROS_ERROR("Create new policy %s ...", name.c_str());
+    ROS_INFO("Create new policy %s ...", name.c_str());
     CaPolicyPair pair = std::make_pair(name, policy);
     policies_.push_back(pair);
     return true;
   }
   catch (std::bad_alloc& ba){
     // std::cerr << "bad_alloc caught: " << ba.what() << '\n';
-    ROS_ERROR("bad_alloc caught: %s", ba.what());
+    ROS_INFO("bad_alloc caught: %s", ba.what());
     return false;
   }
   catch (...)
   {
-    ROS_ERROR("Error when add policy...");
+    ROS_INFO("Error when add policy...");
     return false;
   }
 }
@@ -124,10 +124,10 @@ bool CaPolicyManager::setCurrentPolicy(const std::string name)
     current_policy_ = *exist;
 
     if (name == "normal") {
-      system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/normal.yaml");
+     // system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/normal.yaml");
 
     }else if (name == "social") {
-      system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/social.yaml");
+     // system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/social.yaml");
     }
 
     return true;

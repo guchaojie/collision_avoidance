@@ -84,21 +84,7 @@ public:
   /** @brief Clean the cached frames and remove the old ones if the size of frames is over the threshold. */
   void clearOldFrames();
 
-  void addVector(ros::Time stamp, std::string frame_id, const DetectionVector& vector);
-  void addVector(ros::Time stamp, std::string frame_id, const TrackingVector& vector);
-  void addVector(ros::Time stamp, std::string frame_id, const LocalizationVector& vector);
-
 private:
-
-  /** @brief Calculate the velocity info for objects in the given frame.
-   *  @param[in] frame The pointer to the frame to be processed.
-   */
-  void calcVelocity(std::vector<CaObjectFrame>::iterator& frame);
-
-  /** @brief Publish messages for objects in the given frame.
-   *  @param[in] frame The pointer to the frame to be processed.
-   */
-  void publish(std::vector<CaObjectFrame>::iterator& frame);
   std::vector<CaObjectFrame> frames_;
   int max_frames_;  /**< The number of frames to be archived in memory. */
   ros::NodeHandle nh_;
