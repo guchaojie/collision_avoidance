@@ -77,7 +77,7 @@ void CaPolicyRos::init()
   ca_policy_pub_ = node_handler_.advertise < ca_policy_msgs::CaPolicy > (kTopicCaPolicy, 1);
 
   node_handler_.param("max_detection_distance", max_detection_distance_, 5.0);
-  node_handler_.param("min_interval", min_interval_, 10.0);
+  node_handler_.param("min_interval", min_interval_, 2.0);
 }
 
 void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFrameConstPtr& msg)
@@ -104,8 +104,13 @@ void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFram
   pmsg.header.frame_id = msg->header.frame_id;
   pmsg.robot_id = 0;
 
+  if((social && policy_manager_.getCurrentPolicy() == "social")
+      || (!social && policy_manager_.getCurrentPolicy() == "normal"))
+  {
+    last_set_time_ = now;
+  }
   double duration = now.toSec() - last_set_time_.toSec();
-  if (social && policy_manager_.getCurrentPolicy() != "social")
+  if (social && policy_manager_.getCurrentPolicy() != "social" && duration > min_interval_)
   {
     policy_manager_.setCurrentPolicy("social");
     last_set_time_ = now;
@@ -116,7 +121,7 @@ void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFram
 
   }
 
-  if (!social && policy_manager_.getCurrentPolicy() != "normal")
+  if (!social && policy_manager_.getCurrentPolicy() != "normal" && duration > min_interval_)
   {
     policy_manager_.setCurrentPolicy("normal");
     last_set_time_ = now;
