@@ -124,10 +124,12 @@ bool CaPolicyManager::setCurrentPolicy(const std::string name)
     current_policy_ = *exist;
 
     if (name == "normal") {
-     // system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/normal.yaml");
+      ROS_INFO("Setting the normal configuraiton to Robot");
+      system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/normal.yaml&");
 
     }else if (name == "social") {
-     // system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/social.yaml");
+      ROS_INFO("Setting the social configuraiton to Robot");
+      system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/social.yaml&");
     }
 
     return true;

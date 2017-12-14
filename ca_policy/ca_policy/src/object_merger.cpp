@@ -80,15 +80,13 @@ void ObjectMerger::onObjectsReceived(const object_msgs::ObjectsInBoxesConstPtr& 
                                     const object_analytics_msgs::TrackedObjectsConstPtr& track,
                                     const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc)
 {
-  if(loc->objects_in_boxes.size()==0 || track->tracked_objects.size()==0 || detect->objects_vector.size()==0
-      || loc->header.frame_id != track->header.frame_id || track->header.frame_id != detect->header.frame_id
+  if(loc->header.frame_id != track->header.frame_id || track->header.frame_id != detect->header.frame_id
       || loc->header.frame_id != detect->header.frame_id)
   {
     return;
   }
 
   frames_->processFrame(detect, track, loc);
-
 }
 
 }  // namespace
