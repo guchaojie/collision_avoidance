@@ -156,22 +156,19 @@ std::shared_ptr<CaObjectFrame> Obstacles::getInstance(ros::Time stamp, std::stri
     {
       if (frames_[i].getTfFrameId() == frame_id && frames_[i].getStamp() == stamp)
       {
-        ROS_INFO("Founded!!");
         return std::shared_ptr<CaObjectFrame>(&frames_[i]);
       }
     }
 
-    ROS_INFO("Not found! Then Created new");
     CaObjectFrame new_frame(stamp, frame_id, nh_);
     //std::shared_ptr<CaObjectFrame> frame(new CaObjectFrame(stamp, frame_id, nh_));
     frames_.push_back(new_frame);
-    ROS_INFO("Created!");
     return std::shared_ptr<CaObjectFrame>(&frames_.back());
 
   }
   catch (...)
   {
-    ROS_INFO("Failed when getInstance from Obstacles");
+    ROS_WARN("Failed when getInstance from Obstacles");
     CaObjectFrame new_frame(stamp, frame_id, nh_);
     frames_.push_back(std::move(new_frame));
     return std::shared_ptr<CaObjectFrame>(std::move(&new_frame));
