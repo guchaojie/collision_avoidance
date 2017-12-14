@@ -82,8 +82,6 @@ void CaPolicyRos::init()
 
 void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFrameConstPtr& msg)
 {
-  ROS_INFO("RECEIVE Object SocialObjectsInFrameConstPtr topic...");
-
   ros::Time now = ros::Time::now();
   bool social = false;
 

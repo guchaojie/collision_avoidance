@@ -144,7 +144,6 @@ void CaObjectFrame::mergeObjects()
     return;
   }
 
-  ROS_INFO("MERGING...");
   is_merging_ = true;
   for (DetectionVector::iterator it = objects_detected_.begin(); it != objects_detected_.end(); ++it)
   {
@@ -160,11 +159,9 @@ void CaObjectFrame::mergeObjects()
     bool result = findTrackingObjectByRoi(roi, track_obj);
     if (result)
     {
-      ROS_INFO("...Found Tracking Objects.");
       result = findLocalizationObjectByRoi(roi, loc_obj);
       if (result)
       {
-        ROS_INFO("...Found Localization Objects.");
         merged_obj.min = loc_obj.min;
         merged_obj.max = loc_obj.max;
         merged_obj.id = track_obj.id;
@@ -176,7 +173,6 @@ void CaObjectFrame::mergeObjects()
         objects_merged_.push_back(merged_obj);
       }
     }
-    ROS_INFO("size of objects_merged: %lu", objects_merged_.size());
 
   } // end of for(...)
   is_merging_ = false;
@@ -189,7 +185,6 @@ bool CaObjectFrame::findMergedObjectById(const int id, MergedObject& out)
   {
     if (t.id == id)
     {
-      ROS_INFO("<<<Finding merged objects by ID...>");
       out = t;
       return true;
     }
@@ -206,7 +201,6 @@ bool CaObjectFrame::findMergedObjectByRoi(const ObjectRoi& roi, MergedObject& ou
     if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width
         && roi.height == t.roi.height)
     {
-      ROS_INFO("<<<Finding merged objects by ROI...>");
       out = t;
       return true;
     }
