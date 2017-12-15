@@ -60,8 +60,8 @@ void CaPolicyRos::init()
   vision_obj_sub_ = node_handler_.subscribe(kTopicSocialObjectInFrame, 10, &CaPolicyRos::onObjectReceived, this);
   ca_policy_pub_ = node_handler_.advertise < ca_policy_msgs::CaPolicy > (kTopicCaPolicy, 1);
 
-  node_handler_.param("max_detection_distance", max_detection_distance_, 5.0);
-  node_handler_.param("min_interval", min_interval_, 2.0);
+  node_handler_.param("max_detection_distance", max_detection_distance_, 2.5);
+  node_handler_.param("min_interval", min_interval_, 5.0);
 }
 
 void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFrameConstPtr& msg)
@@ -92,7 +92,7 @@ void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFram
     last_set_time_ = now;
   }
   double duration = now.toSec() - last_set_time_.toSec();
-  if (social && policy_manager_.getCurrentPolicy() != "social" && duration > min_interval_)
+  if (social && policy_manager_.getCurrentPolicy() != "social")
   {
     policy_manager_.setCurrentPolicy("social");
     last_set_time_ = now;
