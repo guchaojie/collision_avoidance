@@ -24,8 +24,7 @@
 
 namespace intelligent_ca
 {
-CaObjectFrame::CaObjectFrame() :
-    nh_("/intelligent_ca/"), published_(false)
+CaObjectFrame::CaObjectFrame() : nh_("/intelligent_ca/"), published_(false)
 {
   merged_objects_pub_ = nh_.advertise<object_bridge_msgs::ObjectsInFrameMerged>(kTopicObjectsInFrame, 1);
   social_object_pub_ = nh_.advertise<object_bridge_msgs::SocialObjectsInFrame>(kTopicSocialObjectInFrame, 1);
@@ -39,8 +38,7 @@ CaObjectFrame::CaObjectFrame() :
   objects_merged_.clear();
 }
 
-CaObjectFrame::CaObjectFrame(ros::NodeHandle nh) :
-    nh_(nh), published_(false)
+CaObjectFrame::CaObjectFrame(ros::NodeHandle nh) : nh_(nh), published_(false)
 {
   merged_objects_pub_ = nh_.advertise<object_bridge_msgs::ObjectsInFrameMerged>(kTopicObjectsInFrame, 1);
   social_object_pub_ = nh_.advertise<object_bridge_msgs::SocialObjectsInFrame>(kTopicSocialObjectInFrame, 1);
@@ -54,8 +52,7 @@ CaObjectFrame::CaObjectFrame(ros::NodeHandle nh) :
   objects_merged_.clear();
 }
 
-CaObjectFrame::CaObjectFrame(ros::Time& stamp, std::string& frame_id, ros::NodeHandle nh) :
-    nh_(nh), published_(false)
+CaObjectFrame::CaObjectFrame(ros::Time& stamp, std::string& frame_id, ros::NodeHandle nh) : nh_(nh), published_(false)
 {
   merged_objects_pub_ = nh_.advertise<object_bridge_msgs::ObjectsInFrameMerged>(kTopicObjectsInFrame, 1);
   social_object_pub_ = nh_.advertise<object_bridge_msgs::SocialObjectsInFrame>(kTopicSocialObjectInFrame, 1);
@@ -97,18 +94,14 @@ void CaObjectFrame::addVector(const DetectionVector& vector)
 
 void CaObjectFrame::addVector(const TrackingVector& vector)
 {
-
   objects_tracked_ = vector;
   mergeObjects();
-
 }
 
 void CaObjectFrame::addVector(const LocalizationVector& vector)
 {
-
   objects_localized_ = vector;
   mergeObjects();
-
 }
 
 void CaObjectFrame::mergeObjects()
@@ -129,7 +122,8 @@ void CaObjectFrame::mergeObjects()
   is_merging_ = true;
   for (DetectionVector::iterator it = objects_detected_.begin(); it != objects_detected_.end(); ++it)
   {
-    if(it->object.probability < posibility_threshold_){
+    if (it->object.probability < posibility_threshold_)
+    {
       continue;
     }
 
@@ -156,7 +150,7 @@ void CaObjectFrame::mergeObjects()
       }
     }
 
-  } // end of for(...)
+  }  // end of for(...)
   is_merging_ = false;
 }
 
@@ -179,9 +173,8 @@ bool CaObjectFrame::findMergedObjectByRoi(const ObjectRoi& roi, MergedObject& ou
   ObjectMergedVector temp_objects = objects_merged_;
   for (auto t : temp_objects)
   {
-
-    if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width
-        && roi.height == t.roi.height)
+    if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width &&
+        roi.height == t.roi.height)
     {
       out = t;
       return true;
@@ -195,8 +188,8 @@ bool CaObjectFrame::findTrackingObjectByRoi(const ObjectRoi& roi, TrackingObject
 {
   for (auto t : objects_tracked_)
   {
-    if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width
-        && roi.height == t.roi.height)
+    if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width &&
+        roi.height == t.roi.height)
     {
       track = t;
       return true;
@@ -210,9 +203,8 @@ bool CaObjectFrame::findLocalizationObjectByRoi(const ObjectRoi& roi, Localizati
 {
   for (auto t : objects_localized_)
   {
-
-    if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width
-        && roi.height == t.roi.height)
+    if (roi.x_offset == t.roi.x_offset && roi.y_offset == t.roi.y_offset && roi.width == t.roi.width &&
+        roi.height == t.roi.height)
     {
       loc = t;
       return true;
@@ -224,12 +216,14 @@ bool CaObjectFrame::findLocalizationObjectByRoi(const ObjectRoi& roi, Localizati
 
 bool CaObjectFrame::publish()
 {
-  if (published_) {
+  if (published_)
+  {
     ROS_INFO("Merged objects have been already published, do nothing");
     return false;
   }
 
-  if (merged_op_msg_enabled_) {
+  if (merged_op_msg_enabled_)
+  {
     ObjectMergedMsg msg;
     msg.header.frame_id = tf_frame_id_;
     msg.header.stamp = stamp_;
@@ -237,42 +231,43 @@ bool CaObjectFrame::publish()
     merged_objects_pub_.publish(msg);
   }
 
-  if (social_msg_enabled_) {
+  if (social_msg_enabled_)
+  {
+    SoicalObjectVector socials;
+    socials.clear();
 
-      SoicalObjectVector socials;
-      socials.clear();
+    if (!objects_merged_.empty())
+    {
+      for (auto ob : objects_merged_)
+      {
+        if (!isSocialObject(ob))
+          break;
 
-      if (!objects_merged_.empty()) {
-        for (auto ob : objects_merged_)
-        {
-          if (!isSocialObject(ob))
-            break;
-
-          SocialObject so;
-          so.id = ob.id;
-          so.name = ob.type;
-          geometry_msgs::Point32 c = getCentroid(ob);
-          so.position.x = c.x;
-          so.position.y = c.y;
-          so.position.z = c.z;
-          so.velocity = ob.velocity;
-          so.reliability = ob.probability;
-          so.tagnames.clear(); /**< Not used */
-          so.tags.clear(); /**< Not used */
-          socials.push_back(so);
-        } 
+        SocialObject so;
+        so.id = ob.id;
+        so.name = ob.type;
+        geometry_msgs::Point32 c = getCentroid(ob);
+        so.position.x = c.x;
+        so.position.y = c.y;
+        so.position.z = c.z;
+        so.velocity = ob.velocity;
+        so.reliability = ob.probability;
+        so.tagnames.clear(); /**< Not used */
+        so.tags.clear();     /**< Not used */
+        socials.push_back(so);
       }
+    }
 
-      SocialObjectsInFrameMsg msg;
-      msg.header.frame_id = tf_frame_id_;
-      msg.header.stamp = stamp_;
-      msg.objects = socials;
-      social_object_pub_.publish(msg);
-   }
+    SocialObjectsInFrameMsg msg;
+    msg.header.frame_id = tf_frame_id_;
+    msg.header.stamp = stamp_;
+    msg.objects = socials;
+    social_object_pub_.publish(msg);
+  }
 
-   setFlagPublished(true);
+  setFlagPublished(true);
 
-   return true;
+  return true;
 }
 
 bool CaObjectFrame::isSocialObject(MergedObject& ob)
@@ -292,4 +287,4 @@ void CaObjectFrame::setFlagPublished(bool state)
 {
   published_ = state;
 }
-} // namespace
+}  // namespace

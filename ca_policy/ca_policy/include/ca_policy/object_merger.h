@@ -27,7 +27,6 @@
 
 namespace intelligent_ca
 {
-
 /** @brief Merging camera related messages into one, with more info(currently velocity) added.
  *         When a given message is received:
  *         1. The class searches the corresponding frame by the same frame_id and stamp, if no, creates a new frame.
@@ -40,24 +39,24 @@ class ObjectMerger
 public:
   ObjectMerger();
   ObjectMerger(ros::NodeHandle& nh);
-  //ObjectMerger(const Obstacles* obstacles, const CaPolicyManager* manager);
+  // ObjectMerger(const Obstacles* obstacles, const CaPolicyManager* manager);
   virtual ~ObjectMerger();
 
 private:
   void onInit(void);
 
   void onObjectsReceived(const object_msgs::ObjectsInBoxesConstPtr& detect,
-                                      const object_analytics_msgs::TrackedObjectsConstPtr& track,
-                                      const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc);
-  
-  //std::shared_ptr<Obstacles> pObstacle_;
+                         const object_analytics_msgs::TrackedObjectsConstPtr& track,
+                         const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc);
+
+  // std::shared_ptr<Obstacles> pObstacle_;
   ros::NodeHandle nh_;
 
-  ros::Subscriber detection_sub_; /// the subscriber of detection messages
-  ros::Subscriber tracking_sub_; /// the subscriber of tracking messages
-  ros::Subscriber localization_sub_; /// the subscriber of localization messages
+  ros::Subscriber detection_sub_;     /// the subscriber of detection messages
+  ros::Subscriber tracking_sub_;      /// the subscriber of tracking messages
+  ros::Subscriber localization_sub_;  /// the subscriber of localization messages
 
-  std::shared_ptr<Obstacles> frames_; /// the frames storing all obstacles' info
+  std::shared_ptr<Obstacles> frames_;  /// the frames storing all obstacles' info
 
   /**< Object Messages, which are initialized from parameter configurer.*/
   std::string msg_object_detection_;
@@ -69,11 +68,11 @@ private:
   using FilteredLocalization = message_filters::Subscriber<LocalizationMsg>;
   using FilteredSync = message_filters::TimeSynchronizer<DetectionMsg, TrackingMsg, LocalizationMsg>;
 
-  std::unique_ptr<FilteredDetection>    f_detection_sub_;
-  std::unique_ptr<FilteredTracking>     f_tracking_sub_;
+  std::unique_ptr<FilteredDetection> f_detection_sub_;
+  std::unique_ptr<FilteredTracking> f_tracking_sub_;
   std::unique_ptr<FilteredLocalization> f_localization_sub_;
-  std::unique_ptr<FilteredSync>         sync_sub_;
+  std::unique_ptr<FilteredSync> sync_sub_;
 };
 
-} // namespace
+}  // namespace
 #endif

@@ -23,7 +23,6 @@
 
 namespace intelligent_ca
 {
-
 ObjectMerger::ObjectMerger() : nh_("~")
 {
   ROS_INFO("ENTER default ObjectMerger Constructor...");
@@ -46,26 +45,27 @@ void ObjectMerger::onInit()
 
   f_detection_sub_ = std::unique_ptr<FilteredDetection>(new FilteredDetection(nh_, msg_object_detection_, 1));
   f_tracking_sub_ = std::unique_ptr<FilteredTracking>(new FilteredTracking(nh_, msg_object_tracking_, 1));
-  f_localization_sub_ = std::unique_ptr<FilteredLocalization>(new FilteredLocalization(nh_, msg_object_localization_, 1));
-  sync_sub_ = std::unique_ptr<FilteredSync>( new FilteredSync(*f_detection_sub_, *f_tracking_sub_, *f_localization_sub_, 10));
-  sync_sub_->registerCallback(boost::bind(&ObjectMerger::onObjectsReceived,this, _1, _2, _3));
+  f_localization_sub_ =
+      std::unique_ptr<FilteredLocalization>(new FilteredLocalization(nh_, msg_object_localization_, 1));
+  sync_sub_ =
+      std::unique_ptr<FilteredSync>(new FilteredSync(*f_detection_sub_, *f_tracking_sub_, *f_localization_sub_, 10));
+  sync_sub_->registerCallback(boost::bind(&ObjectMerger::onObjectsReceived, this, _1, _2, _3));
 
   frames_ = std::make_shared<Obstacles>(nh_);
   ROS_INFO("message_detction:%s, tracking:%s, localization:%s", msg_object_detection_.c_str(),
-            msg_object_tracking_.c_str(), msg_object_localization_.c_str());
+           msg_object_tracking_.c_str(), msg_object_localization_.c_str());
 }
 
 ObjectMerger::~ObjectMerger()
 {
 }
 
-
 void ObjectMerger::onObjectsReceived(const object_msgs::ObjectsInBoxesConstPtr& detect,
-                                    const object_analytics_msgs::TrackedObjectsConstPtr& track,
-                                    const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc)
+                                     const object_analytics_msgs::TrackedObjectsConstPtr& track,
+                                     const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc)
 {
-  if(loc->header.frame_id != track->header.frame_id || track->header.frame_id != detect->header.frame_id
-      || loc->header.frame_id != detect->header.frame_id)
+  if (loc->header.frame_id != track->header.frame_id || track->header.frame_id != detect->header.frame_id ||
+      loc->header.frame_id != detect->header.frame_id)
   {
     return;
   }

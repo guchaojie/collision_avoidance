@@ -14,12 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <boost/thread/thread.hpp>
-#include <vector>
-
-#include <math.h>
 #include <ros/ros.h>
-//#include <ca_policy_msgs/People.h>
 #include "ca_policy/ca_policy.h"
 #include "object_bridge_msgs/ObjectMerged.h"
 #include <tf/transform_listener.h>

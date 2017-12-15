@@ -39,7 +39,8 @@ CaPolicyManager::~CaPolicyManager()
 
 bool CaPolicyManager::addPolicy(const std::string name, const std::shared_ptr<CaPolicy>& policy)
 {
-  try{
+  try
+  {
     CaPolicyVector::iterator exist;
     bool found = findPolicy(name, exist);
     if (found)
@@ -54,7 +55,8 @@ bool CaPolicyManager::addPolicy(const std::string name, const std::shared_ptr<Ca
     policies_.push_back(pair);
     return true;
   }
-  catch (std::bad_alloc& ba){
+  catch (std::bad_alloc& ba)
+  {
     // std::cerr << "bad_alloc caught: " << ba.what() << '\n';
     ROS_INFO("bad_alloc caught: %s", ba.what());
     return false;
@@ -68,13 +70,25 @@ bool CaPolicyManager::addPolicy(const std::string name, const std::shared_ptr<Ca
 
 bool CaPolicyManager::deletePolicy(const std::string name)
 {
-
   CaPolicyVector::iterator exist;
   bool found = findPolicy(name, exist);
   if (found)
   {
     policies_.erase(exist);
     return true;
+  }
+
+  return false;
+}
+
+bool CaPolicyManager::isPolicyExist(const std::string name)
+{
+  for (CaPolicyVector::iterator it = policies_.begin(); it != policies_.end(); ++it)
+  {
+    if (name == std::get<0>(*it))
+    {
+      return true;
+    }
   }
 
   return false;
@@ -100,18 +114,19 @@ std::string CaPolicyManager::getCurrentPolicy()
 }
 bool CaPolicyManager::setCurrentPolicy(const std::string name)
 {
-
   CaPolicyVector::iterator exist;
   bool found = findPolicy(name, exist);
   if (found)
   {
     current_policy_ = *exist;
 
-    if (name == "normal") {
+    if (name == "normal")
+    {
       ROS_INFO("Setting the normal configuraiton to Robot");
       system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/normal.yaml&");
-
-    }else if (name == "social") {
+    }
+    else if (name == "social")
+    {
       ROS_INFO("Setting the social configuraiton to Robot");
       system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/social.yaml&");
     }
@@ -123,7 +138,6 @@ bool CaPolicyManager::setCurrentPolicy(const std::string name)
     ROS_WARN("No policy named %s", name.c_str());
     return false;
   }
-
 }
 
-} // namespace
+}  // namespace

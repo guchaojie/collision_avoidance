@@ -26,7 +26,7 @@
 
 namespace intelligent_ca
 {
-constexpr int kDefaultMaxFrames=20;
+constexpr int kDefaultMaxFrames = 20;
 
 class Obstacles
 {
@@ -35,10 +35,18 @@ public:
   Obstacles(ros::NodeHandle nh);
   virtual ~Obstacles();
 
+  /** @brief Callback function for message filters interface.
+     *  @param[in] detect   detection messages received from vision object component.
+     *  @param[in] track    tracking messages received from vision object component.
+     *  @param[in] loc      localization messages received from vision object component.
+     */
   void processFrame(const object_msgs::ObjectsInBoxesConstPtr& detect,
                     const object_analytics_msgs::TrackedObjectsConstPtr& track,
                     const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc);
 
+  /** @brief Calculates velocity for a given Object Frame.
+   *  @param[in] frame The frame to be calculated.
+   */
   void calcVelocity(CaObjectFrame& frame);
 
   /** @brief Search and return the instance of a frame by the given frame_id and time stamp.
@@ -65,13 +73,12 @@ public:
    */
   bool findObjectFrame(ros::Time stamp, std::string frame_id, std::shared_ptr<CaObjectFrame>& frame_out);
 
-
   /** @brief Clean the cached frames and remove the old ones if the size of frames is over the threshold. */
   void clearOldFrames();
 
 private:
   std::vector<CaObjectFrame> frames_;
-  int max_frames_;  /**< The number of frames to be archived in memory. */
+  int max_frames_; /**< The number of frames to be archived in memory. */
   bool velocity_enabled;
   ros::NodeHandle nh_;
 };

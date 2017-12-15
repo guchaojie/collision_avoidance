@@ -65,5 +65,5 @@ const std::string kTopicCaPolicy = "ca_policy";
 const std::string kTopicObjectsInFrame = "object_merged";
 const std::string kTopicSocialObjectInFrame = "/vision_object/social_object";
 
-} // namespace
+}  // namespace
 #endif
