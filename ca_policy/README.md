@@ -9,43 +9,48 @@ Intel ros\_object\_analytics is the default dependency package which provides th
 
 See below for the detailed message definition
 ### Camera based object detection message
-
-    ```bash
-    movidius_ncs_msgs/ObjectsInBoxes.msg:
+  * movidius_ncs_msgs/ObjectsInBoxes.msg:
+  ```bash
        std_msgs/Header header
        ObjectInBox[] objects_vector
        float32 inference_time_ms
        float32 fps
-    movidius_ncs_msgs/ObjectInBoxe.msg:
+  ```
+  * movidius_ncs_msgs/ObjectInBoxe.msg:
+  ```bash
        Object object
        sensor_msgs/RegionOfInterest roi
-    movidius_ncs_msgs/Object.msg:
+  ```
+  * movidius_ncs_msgs/Object.msg:
+  ```bash
        string object_name
        float32 probability
-    ```
+  ```
 
 ### Camera based object localization message
-
-    ```bash
-    object\_analytics\_msgs/ObjectsInBoxes3D.msg:
+  * object\_analytics\_msgs/ObjectsInBoxes3D.msg:
+  ```bash
        std_msgs/Header header
        ObjectInBox3D[] objects_in_boxes  # ObjectInBox3D array
-
-    object\_analytics\_msgs/ObjectInBox.msg:
+  ```
+  * object\_analytics\_msgs/ObjectInBox.msg:
+  ```bash
        sensor_msgs/RegionOfInterest roi      # region of interest
        geometry_msgs/Point32 min             # min and max locate the diagonal of a bounding-box of the detected object whose
        geometry_msgs/Point32 max             # x, y and z axis parellel to the axises correspondingly in camera coordinates
-    ```
+  ```
 
 ### Camera based object tracking message
-    ```bash
-    object\_analytics\_msgs/TrackedObjects.msg:
+  * object\_analytics\_msgs/TrackedObjects.msg:
+  ```bash
        std_msgs/Header header              # timestamp in header is the time the sensor captured the raw data
        TrackedObject[] tracked_objects     # TrackedObject array
-    object\_analytics\_msgs/TrackedObject.msg:
+  ```
+  * object\_analytics\_msgs/TrackedObject.msg:
+  ```bash
        int32 id                            # object identifier
        sensor_msgs/RegionOfInterest roi    # region of interest
-    ```
+  ```
 
 ## Outputs
 
@@ -85,6 +90,6 @@ CA Policy module publishes some messages to indicate different status/data.
   * Velocity calculating is not considered in coordinates transformation. In the current version, calculating velocity under camera coordinates takes tolerance when robot moves.
   * some code should be changed for adding new policy. There is code optimization space for policy management.
 
-
-> * For security issues, please send mail to wei.zhi.liu@intel.com
+## Security
+> For security issues, please send mail to wei.zhi.liu@intel.com
 
