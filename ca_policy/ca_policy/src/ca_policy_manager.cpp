@@ -124,14 +124,14 @@ bool CaPolicyManager::setCurrentPolicy(const std::string name)
     {
       ROS_INFO("Setting the normal configuraiton to Robot");
       system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/normal.yaml&");
-      system("rostopic pub /water_uavcan_master/set_led std_msgs/UInt8MultiArray
+      system("rostopic pub /water_uavcan_master/set_led std_msgs/UInt8MultiArray \
           \"{layout: {dim: {label:'', size:0, stride:0, data_offset:0, data:[1, 0, 0, 128]}}}\"");
     }
     else if (name == "social")
     {
       ROS_INFO("Setting the social configuraiton to Robot");
       system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/social.yaml&");
-      system("rostopic pub /water_uavcan_master/set_led std_msgs/UInt8MultiArray
+      system("rostopic pub /water_uavcan_master/set_led std_msgs/UInt8MultiArray \
                 \"{layout: {dim: {label:'', size:0, stride:0, data_offset:0, data:[2, 0, 0, 128]}}}\"");
     }
 
