@@ -39,7 +39,6 @@ class ObjectMerger
 public:
   ObjectMerger();
   ObjectMerger(ros::NodeHandle& nh);
-  // ObjectMerger(const Obstacles* obstacles, const CaPolicyManager* manager);
   virtual ~ObjectMerger();
 
 private:
@@ -49,16 +48,15 @@ private:
                          const object_analytics_msgs::TrackedObjectsConstPtr& track,
                          const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc);
 
-  // std::shared_ptr<Obstacles> pObstacle_;
   ros::NodeHandle nh_;
 
-  ros::Subscriber detection_sub_;     /// the subscriber of detection messages
-  ros::Subscriber tracking_sub_;      /// the subscriber of tracking messages
-  ros::Subscriber localization_sub_;  /// the subscriber of localization messages
+  ros::Subscriber detection_sub_;     /**< the subscriber of detection messages */
+  ros::Subscriber tracking_sub_;      /**< the subscriber of tracking messages*/
+  ros::Subscriber localization_sub_;  /**< the subscriber of localization messages*/
 
-  std::shared_ptr<Obstacles> frames_;  /// the frames storing all obstacles' info
+  std::shared_ptr<Obstacles> frames_;  /**< the frames storing all obstacles' info
 
-  /**< Object Messages, which are initialized from parameter configurer.*/
+  /**< Object Messages, which are initialized from parameter re-configure.*/
   std::string msg_object_detection_;
   std::string msg_object_tracking_;
   std::string msg_object_localization_;
