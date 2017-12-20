@@ -13,17 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <boost/thread/thread.hpp>
 #include <vector>
-
-//#include <math.h>
 #include <ros/ros.h>
-//#include <ca_policy_msgs/People.h>
 #include "ca_policy/ca_policy.h"
 #include "ca_policy/ca_policy_manager.h"
 #include "ca_policy/consts.h"
 #include "object_bridge_msgs/ObjectMerged.h"
-#include <tf/transform_listener.h>
 
 namespace intelligent_ca
 {
@@ -51,19 +46,18 @@ bool CaPolicyManager::addPolicy(const std::string name, const std::shared_ptr<Ca
     }
 
     ROS_INFO("Create new policy %s ...", name.c_str());
-    CaPolicyPair pair = std::make_pair(name, policy);
-    policies_.push_back(pair);
+    CaPolicyPair policy_pair = std::make_pair(name, policy);
+    policies_.push_back(policy_pair);
     return true;
   }
   catch (std::bad_alloc& ba)
   {
-    // std::cerr << "bad_alloc caught: " << ba.what() << '\n';
-    ROS_INFO("bad_alloc caught: %s", ba.what());
+    ROS_WARN("bad_alloc caught: %s", ba.what());
     return false;
   }
   catch (...)
   {
-    ROS_INFO("Error when add policy...");
+    ROS_WARN("Error when add policy...");
     return false;
   }
 }
@@ -122,17 +116,11 @@ bool CaPolicyManager::setCurrentPolicy(const std::string name)
 
     if (name == "normal")
     {
-      ROS_INFO("Setting the normal configuraiton to Robot");
-      system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/normal.yaml&");
-      system("rostopic pub /water_uavcan_master/set_led std_msgs/UInt8MultiArray \
-          \"{layout: {dim: {label:'', size:0, stride:0, data_offset:0, data:[1, 0, 0, 128]}}}\"");
+      std::get<1>(current_policy_)->execute();
     }
     else if (name == "social")
     {
-      ROS_INFO("Setting the social configuraiton to Robot");
-      system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/social.yaml&");
-      system("rostopic pub /water_uavcan_master/set_led std_msgs/UInt8MultiArray \
-                \"{layout: {dim: {label:'', size:0, stride:0, data_offset:0, data:[2, 0, 0, 128]}}}\"");
+      std::get<1>(current_policy_)->execute();
     }
 
     return true;

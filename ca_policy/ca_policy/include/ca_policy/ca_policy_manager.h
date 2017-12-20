@@ -75,8 +75,8 @@ private:
    */
   bool findPolicy(const std::string name, CaPolicyVector::iterator& pair);
 
-  CaPolicyVector policies_;      /**< @brief CA policy list. */
-  CaPolicyPair current_policy_;  /**< @brief The working CA policy, which is used to configure navigation. */
+  CaPolicyVector policies_;     /**< @brief CA policy list. */
+  CaPolicyPair current_policy_; /**< @brief The working CA policy, which is used to configure navigation. */
 };
 
 }  // namespace

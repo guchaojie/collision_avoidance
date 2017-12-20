@@ -22,8 +22,7 @@
 
 namespace intelligent_ca
 {
-CaPolicyRos::CaPolicyRos(ros::NodeHandle& nh) :
-    node_handler_(nh), last_set_time_(0)
+CaPolicyRos::CaPolicyRos(ros::NodeHandle& nh) : node_handler_(nh), last_set_time_(0)
 {
   ROS_INFO("ENTER CaPolicyRos Constructor...");
   init();
@@ -35,7 +34,6 @@ CaPolicyRos::~CaPolicyRos()
 
 void CaPolicyRos::init()
 {
-
   if (node_handler_.hasParam("CaPolicies"))
   {
     XmlRpc::XmlRpcValue my_list;
@@ -45,10 +43,8 @@ void CaPolicyRos::init()
       std::string pname = static_cast<std::string>(my_list[i]["name"]);
       std::string config = static_cast<std::string>(my_list[i]["config"]);
       ROS_INFO("Using CA Policy \"%s:%s\"", pname.c_str(), config.c_str());
-      ROS_INFO("Using CA Policy \"%s:%s\"", pname.c_str(), config.c_str());
 
-      // CaPolicy policy(pname, config);
-      std::shared_ptr<CaPolicy> policy = policy_builder_.createInstance(pname);
+      std::shared_ptr<CaPolicy> policy = policy_builder_.createInstance(node_handler_, pname);
       policy->setConfiguration(config);
       policy_manager_.addPolicy(pname, policy);
     }
@@ -56,7 +52,7 @@ void CaPolicyRos::init()
 
   if (!policy_manager_.isPolicyExist("normal"))
   {
-    std::shared_ptr<CaPolicy> policy = policy_builder_.createInstance("normal");
+    std::shared_ptr<CaPolicy> policy = policy_builder_.createInstance(node_handler_, "normal");
     policy->setConfiguration("");
     policy_manager_.addPolicy("normal", policy);
   }
@@ -92,8 +88,8 @@ void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFram
   pmsg.header.frame_id = msg->header.frame_id;
   pmsg.robot_id = 0;
 
-  if ((social && policy_manager_.getCurrentPolicy() == "social")
-      || (!social && policy_manager_.getCurrentPolicy() == "normal"))
+  if ((social && policy_manager_.getCurrentPolicy() == "social") ||
+      (!social && policy_manager_.getCurrentPolicy() == "normal"))
   {
     last_set_time_ = now;
   }
@@ -118,4 +114,4 @@ void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFram
   }
 }
 
-} // namespace
+}  // namespace

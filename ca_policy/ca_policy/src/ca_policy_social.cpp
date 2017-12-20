@@ -23,11 +23,7 @@
 
 namespace intelligent_ca
 {
-SocialCaPolicy::SocialCaPolicy() : CaPolicy()
-{
-}
-
-SocialCaPolicy::SocialCaPolicy(const std::string& name, const std::string& config) : CaPolicy(name, config)
+SocialCaPolicy::SocialCaPolicy(const ros::NodeHandle& ros_node) : CaPolicy(ros_node)
 {
 }
 
@@ -35,15 +31,18 @@ SocialCaPolicy::~SocialCaPolicy()
 {
 }
 
+void SocialCaPolicy::executeReconfig()
+{
+  system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/social.yaml&");
+}
+
 void SocialCaPolicy::execute()
 {
   ROS_INFO("executing Social CA policy ...");
 
-  /**< @todo TODO: reconfig navigation stack with config file*/
   executeReconfig();
 
-  /**< @todo TODO: turn off robot LED */
-  executeLED("flashing");
+  executeLED(CA_LED_BLINK);
 }
 
 }  // namespace

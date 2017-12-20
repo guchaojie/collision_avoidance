@@ -20,11 +20,7 @@
 
 namespace intelligent_ca
 {
-NormalCaPolicy::NormalCaPolicy() : CaPolicy()
-{
-}
-
-NormalCaPolicy::NormalCaPolicy(const std::string& name, const std::string& config) : CaPolicy(name, config)
+NormalCaPolicy::NormalCaPolicy(const ros::NodeHandle& ros_node) : CaPolicy(ros_node)
 {
 }
 
@@ -32,15 +28,18 @@ NormalCaPolicy::~NormalCaPolicy()
 {
 }
 
+void NormalCaPolicy::executeReconfig()
+{
+  system("rosrun dynamic_reconfigure dynparam load /move_base/DWAPlannerROS /opt/ca_policy/param/normal.yaml&");
+}
+
 void NormalCaPolicy::execute()
 {
   ROS_INFO("executing Normal CA policy ...");
 
-  /**< @todo TODO: reconfig navigation stack with config file*/
   executeReconfig();
 
-  /**< @todo TODO: turn off robot LED */
-  executeLED("flashing");
+  executeLED(CA_LED_ON);
 }
 
 }  // namespace

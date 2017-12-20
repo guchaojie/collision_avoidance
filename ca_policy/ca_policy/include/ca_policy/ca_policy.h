@@ -18,10 +18,21 @@
 
 #include <ros/ros.h>
 #include <vector>
-#include <math.h>
+#include <std_msgs/MultiArrayLayout.h>
+#include <std_msgs/MultiArrayDimension.h>
+#include <std_msgs/UInt8MultiArray.h>
 
 namespace intelligent_ca
 {
+/**< LED States for Water Robot Base. */
+enum LEDState
+{
+  CA_LED_OFF = 0,
+  CA_LED_ON,
+  CA_LED_BLINK,
+  CA_LED_BREATHE
+};
+
 /** @brief CA Policy description.
  * This class stores any information about CA Policy.
  * each policy holds a name and a config file.
@@ -29,8 +40,8 @@ namespace intelligent_ca
 class CaPolicy
 {
 public:
-  CaPolicy();
-  CaPolicy(const std::string& name, const std::string& config);
+  CaPolicy(const ros::NodeHandle& ros_node);
+  // CaPolicy(ros::NodeHandle* ros_node, const std::string& name, const std::string& config);
   virtual ~CaPolicy();
 
   /** @brief execute the policy*/
@@ -45,7 +56,10 @@ public:
   /** @brief  Get the config file path for the ca policy.
    *  @return The string storing the policy's config file path.
    */
-  std::string getConfiguration();
+  std::string getConfiguration()
+  {
+    return config_file_;
+  }
 
   /** @brief  Set policy name
    *  @param[in] name The policy name to be set.
@@ -56,20 +70,33 @@ public:
   /** @brief Get policy name.
    *  @return String storing policy name.
    */
-  std::string getPolicyName();
+  std::string getPolicyName()
+  {
+    return name_;
+  }
 
   /** @brief Reconfigure Navigation's paramters */
   virtual void executeReconfig(){};
 
   /** @brief Set LED's status.
-   *  @param[in] type LED status to be set. "flashing", "on", "off", "dim", etc.
+   *  @param[in] state LED status to be set. see enum LEDState..
    */
-  virtual void executeLED(std::string type){};
+  void executeLED(LEDState state);
 
 protected:
-  // ros::NodeHandle nh_;
+  ros::NodeHandle nh_;
   std::string config_file_;  ///@brief configuration file path
   std::string name_;         ///@brief CA Policy name, "safety", "robot", "normal" would be current option.
+
+  int luminance_;
+  /** Format of led_array_.data:
+   *  data[0]: LED state, see enum LEDState.
+   *  data[1]: 0, not used.
+   *  data[2]: 0, not used.
+   *  data[3]: luminance [0, 255]
+   */
+  std_msgs::UInt8MultiArray led_array_;
+  ros::Publisher ca_led_pub_;
 };
 
 }  // namespace

@@ -38,12 +38,12 @@ public:
    *  @param[in] name the name of the CA policy to be created.
    *  @return    the shared pointer of the created CA Policy instance.
    */
-  std::shared_ptr<CaPolicy> createInstance(const std::string name)
+  std::shared_ptr<CaPolicy> createInstance(const ros::NodeHandle& ros_node, const std::string& name)
   {
     if (name == "social")
-      return std::make_shared<SocialCaPolicy>();
+      return std::make_shared<SocialCaPolicy>(ros_node);
 
-    return std::make_shared<NormalCaPolicy>();
+    return std::make_shared<NormalCaPolicy>(ros_node);
   }
 };
 

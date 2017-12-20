@@ -30,7 +30,6 @@ namespace intelligent_ca
 class CaPolicyRos
 {
 public:
-  // CaPolicyRos();
   CaPolicyRos(ros::NodeHandle& nh);
   virtual ~CaPolicyRos();
 
@@ -45,8 +44,8 @@ private:
 
   ros::NodeHandle node_handler_;
 
-  ros::Subscriber vision_obj_sub_;  /**< the subscriber of detection messages. */
-  ros::Publisher ca_policy_pub_;    /**< The publisher of ca_policy status. */
+  ros::Subscriber vision_obj_sub_; /**< the subscriber of detection messages. */
+  ros::Publisher ca_policy_pub_;   /**< The publisher of ca_policy status. */
 
   CaPolicyManager policy_manager_;
   CaPolicyBuilder policy_builder_;
