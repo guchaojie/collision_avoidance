@@ -28,12 +28,16 @@ namespace intelligent_ca
 class NormalCaPolicy : public CaPolicy
 {
 public:
-  NormalCaPolicy();
-  NormalCaPolicy(const std::string& name, const std::string& config);
+  NormalCaPolicy(const ros::NodeHandle& ros_node);
+  // NormalCaPolicy(ros::NodeHandle* ros_node, const std::string& name, const std::string& config);
   virtual ~NormalCaPolicy();
 
   /** @brief execute the policy*/
-  virtual void execute();
+  void execute();
+
+private:
+  /** @brief implementation for dynamic reconfiguration to navigation stack. */
+  void executeReconfig();
 };
 
 }  // namespace

@@ -21,12 +21,10 @@
 
 namespace intelligent_ca
 {
-CaPolicy::CaPolicy() : name_(""), config_file_("")
+CaPolicy::CaPolicy(const ros::NodeHandle& ros_node) : nh_(ros_node), name_(""), config_file_("")
 {
-}
-
-CaPolicy::CaPolicy(const std::string& name, const std::string& config) : name_(name), config_file_(config)
-{
+  nh_.param("luminance", luminance_, 128);
+  ca_led_pub_ = nh_.advertise<std_msgs::UInt8MultiArray>("/water_uavcan_master/set_led", 100);
 }
 
 CaPolicy::~CaPolicy()
@@ -40,11 +38,6 @@ bool CaPolicy::setConfiguration(const std::string& config)
   return true;
 }
 
-std::string CaPolicy::getConfiguration(void)
-{
-  return config_file_;
-}
-
 bool CaPolicy::setPolicyName(const std::string& name)
 {
   name_ = name;
@@ -52,9 +45,18 @@ bool CaPolicy::setPolicyName(const std::string& name)
   return true;
 }
 
-std::string CaPolicy::getPolicyName(void)
+void CaPolicy::executeLED(LEDState state)
 {
-  return name_;
+  led_array_.data.clear();
+  led_array_.data.resize(4, 0);
+
+  /**< set LED state. */
+  led_array_.data[0] = state;
+
+  /**< set LED luminance. */
+  led_array_.data[3] = luminance_;
+
+  ca_led_pub_.publish(led_array_);
 }
 
 }  // namespace

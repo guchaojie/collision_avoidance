@@ -165,10 +165,10 @@ private:
   TrackingVector objects_tracked_;
   LocalizationVector objects_localized_;
 
-  ros::Publisher merged_objects_pub_;  /**<@brief ros publisher for merged object topic.*/
-  ros::Publisher social_object_pub_;   /**<@brief ros publisher for social object topic.*/
-  ObjectMergedVector objects_merged_;  /**<@brief vector storing the merged objects.*/
-  bool published_;                     /**<@brief published status for the merged topic vector. true means published.*/
+  ros::Publisher merged_objects_pub_; /**<@brief ros publisher for merged object topic.*/
+  ros::Publisher social_object_pub_;  /**<@brief ros publisher for social object topic.*/
+  ObjectMergedVector objects_merged_; /**<@brief vector storing the merged objects.*/
+  bool published_;                    /**<@brief published status for the merged topic vector. true means published.*/
 
   bool social_msg_enabled_;
   bool merged_op_msg_enabled_;

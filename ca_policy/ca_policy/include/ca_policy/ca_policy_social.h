@@ -27,12 +27,16 @@ namespace intelligent_ca
 class SocialCaPolicy : public CaPolicy
 {
 public:
-  SocialCaPolicy();
-  SocialCaPolicy(const std::string& name, const std::string& config);
+  SocialCaPolicy(const ros::NodeHandle& ros_node);
+  // SocialCaPolicy(ros::NodeHandle* ros_node, const std::string& name, const std::string& config);
   virtual ~SocialCaPolicy();
 
   /** @brief execute the policy*/
-  virtual void execute();
+  void execute();
+
+private:
+  /** @brief implementation for dynamic reconfiguration to navigation stack. */
+  void executeReconfig();
 };
 
 }  // namespace
