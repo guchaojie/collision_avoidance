@@ -26,10 +26,9 @@ int main(int argc, char** argv)
 
   ROS_INFO("ENTER vision_object node. ");
 
-
   ObjectMerger merger(node_handler);
 
   ros::spin();
 
-  return(0);
+  return (0);
 }

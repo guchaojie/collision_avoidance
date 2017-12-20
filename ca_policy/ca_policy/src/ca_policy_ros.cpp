@@ -22,7 +22,6 @@
 
 namespace intelligent_ca
 {
-
 CaPolicyRos::CaPolicyRos(ros::NodeHandle& nh) :
     node_handler_(nh), last_set_time_(0)
 {
@@ -36,29 +35,35 @@ CaPolicyRos::~CaPolicyRos()
 
 void CaPolicyRos::init()
 {
-  if (!node_handler_.hasParam("CaPolicies"))
-  {
-    ROS_INFO("No policies are set in parameter file. EXIT!");
-    return;
-  }
-  XmlRpc::XmlRpcValue my_list;
-  node_handler_.getParam("CaPolicies", my_list);
-  for (int32_t i = 0; i < my_list.size(); ++i)
-  {
-    std::string pname = static_cast<std::string>(my_list[i]["name"]);
-    std::string config = static_cast<std::string>(my_list[i]["config"]);
-    ROS_INFO("Using CA Policy \"%s:%s\"", pname.c_str(), config.c_str());
-    ROS_INFO("Using CA Policy \"%s:%s\"", pname.c_str(), config.c_str());
 
-    // CaPolicy policy(pname, config);
-    std::shared_ptr<CaPolicy> policy = policy_builder_.createInstance(pname);
-    policy->setConfiguration(config);
-    policy_manager_.addPolicy(pname, policy);
+  if (node_handler_.hasParam("CaPolicies"))
+  {
+    XmlRpc::XmlRpcValue my_list;
+    node_handler_.getParam("CaPolicies", my_list);
+    for (int32_t i = 0; i < my_list.size(); ++i)
+    {
+      std::string pname = static_cast<std::string>(my_list[i]["name"]);
+      std::string config = static_cast<std::string>(my_list[i]["config"]);
+      ROS_INFO("Using CA Policy \"%s:%s\"", pname.c_str(), config.c_str());
+      ROS_INFO("Using CA Policy \"%s:%s\"", pname.c_str(), config.c_str());
+
+      // CaPolicy policy(pname, config);
+      std::shared_ptr<CaPolicy> policy = policy_builder_.createInstance(pname);
+      policy->setConfiguration(config);
+      policy_manager_.addPolicy(pname, policy);
+    }
+  }
+
+  if (!policy_manager_.isPolicyExist("normal"))
+  {
+    std::shared_ptr<CaPolicy> policy = policy_builder_.createInstance("normal");
+    policy->setConfiguration("");
+    policy_manager_.addPolicy("normal", policy);
   }
   policy_manager_.setCurrentPolicy("normal");
 
   vision_obj_sub_ = node_handler_.subscribe(kTopicSocialObjectInFrame, 10, &CaPolicyRos::onObjectReceived, this);
-  ca_policy_pub_ = node_handler_.advertise < ca_policy_msgs::CaPolicy > (kTopicCaPolicy, 1);
+  ca_policy_pub_ = node_handler_.advertise<ca_policy_msgs::CaPolicy>(kTopicCaPolicy, 1);
 
   node_handler_.param("max_detection_distance", max_detection_distance_, 2.5);
   node_handler_.param("min_interval", min_interval_, 5.0);
@@ -69,16 +74,17 @@ void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFram
   ros::Time now = ros::Time::now();
   bool social = false;
 
-  if (!msg->objects.empty()) {
+  if (!msg->objects.empty())
+  {
     for (auto obj : msg->objects)
     {
-       geometry_msgs::Point p = obj.position;
-       if ((sqrt(p.x * p.x + p.y * p.y + p.z * p.z) < max_detection_distance_) &&
-         obj.name == "person") {
-         social = true;
-         break;
-       }
-    } 
+      geometry_msgs::Point p = obj.position;
+      if ((sqrt(p.x * p.x + p.y * p.y + p.z * p.z) < max_detection_distance_) && obj.name == "person")
+      {
+        social = true;
+        break;
+      }
+    }
   }
 
   ca_policy_msgs::CaPolicy pmsg;
@@ -86,7 +92,7 @@ void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFram
   pmsg.header.frame_id = msg->header.frame_id;
   pmsg.robot_id = 0;
 
-  if((social && policy_manager_.getCurrentPolicy() == "social")
+  if ((social && policy_manager_.getCurrentPolicy() == "social")
       || (!social && policy_manager_.getCurrentPolicy() == "normal"))
   {
     last_set_time_ = now;
@@ -100,7 +106,6 @@ void CaPolicyRos::onObjectReceived(const object_bridge_msgs::SocialObjectsInFram
     pmsg.id = ca_policy_msgs::CaPolicy::CAPOLICY_PEOPLE;
     pmsg.name = "social";
     ca_policy_pub_.publish(pmsg);
-
   }
 
   if (!social && policy_manager_.getCurrentPolicy() != "normal" && duration > min_interval_)

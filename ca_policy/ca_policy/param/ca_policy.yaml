@@ -12,7 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#CA Policies supported
+# Note that normal Policy must be set.
 CaPolicies:
    - {name: "normal",  config: "normal.yaml"}
    - {name: "social",  config: "social.yaml"}
+
+#maximum distance from robot to a person when social policy is enabled.
+max_detection_distance: 2.5
+
+#minimal interval in which social policy should be kept.
+min_interval: 5.0
+
 

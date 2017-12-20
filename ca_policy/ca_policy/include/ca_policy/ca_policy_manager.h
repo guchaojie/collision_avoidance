@@ -50,13 +50,24 @@ public:
    */
   bool deletePolicy(const std::string name);
 
-  // CaPolicy getPolicyByName(const std::string name);
-
+  /** @brief Get the name of the current CA policy.
+   *  @return the name of the current CA policy.
+   */
   std::string getCurrentPolicy();
+
+  /** @brief Enable a given CA policy.
+   *  @param[in] name The name of the CA policy to be enabled.
+   *  @return true if successfully set. false otherwise.
+   */
   bool setCurrentPolicy(const std::string name);
 
-private:
+  /** @brief Check a given policy exists or not.
+   *  @param[in] name The name of the CA policy to be checked.
+   *  @return true if policy _name_ is existed. false otherwise.
+   */
+  bool isPolicyExist(const std::string name);
 
+private:
   /** @brief Search and return the CA policy by the given name.
    *  @param[in] name The name of the policy to be searched.
    *  @param[out] pair The iterator of the policy found.
@@ -64,8 +75,8 @@ private:
    */
   bool findPolicy(const std::string name, CaPolicyVector::iterator& pair);
 
-  CaPolicyVector policies_; ///@brief CA policy list
-  CaPolicyPair current_policy_; ///@brief The working CA policy, which is used to configure navigation.
+  CaPolicyVector policies_;      /**< @brief CA policy list. */
+  CaPolicyPair current_policy_;  /**< @brief The working CA policy, which is used to configure navigation. */
 };
 
 }  // namespace

@@ -58,7 +58,12 @@ public:
    */
   std::string getPolicyName();
 
+  /** @brief Reconfigure Navigation's paramters */
   virtual void executeReconfig(){};
+
+  /** @brief Set LED's status.
+   *  @param[in] type LED status to be set. "flashing", "on", "off", "dim", etc.
+   */
   virtual void executeLED(std::string type){};
 
 protected:

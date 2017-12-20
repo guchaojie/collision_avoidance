@@ -23,11 +23,9 @@
 
 namespace intelligent_ca
 {
-/** @brief CA Policy description.
- * This class stores any information about CA Policy.
- * each policy holds a name and a config file.
+/** @brief Normal CA Policy class.
  */
-class NormalCaPolicy:public CaPolicy
+class NormalCaPolicy : public CaPolicy
 {
 public:
   NormalCaPolicy();
@@ -36,7 +34,6 @@ public:
 
   /** @brief execute the policy*/
   virtual void execute();
-
 };
 
 }  // namespace

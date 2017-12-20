@@ -21,17 +21,14 @@
 
 namespace intelligent_ca
 {
-Obstacles::Obstacles(ros::NodeHandle nh) :
-    nh_(nh)
+Obstacles::Obstacles(ros::NodeHandle nh) : nh_(nh)
 {
   frames_.clear();
   nh_.param("max_frames", max_frames_, kDefaultMaxFrames);
   nh_.param("velocity_enabled", velocity_enabled, true);
-
 }
 
-Obstacles::Obstacles() :
-    nh_("/intelligent_ca/")
+Obstacles::Obstacles() : nh_("/intelligent_ca/")
 {
   frames_.clear();
   nh_.param("max_frames", max_frames_, kDefaultMaxFrames);
@@ -59,7 +56,6 @@ void Obstacles::calcVelocity(CaObjectFrame& frame)
     /**< Find the latest objects from frames (in reverse order) */
     for (unsigned int i = size_frames; i > 0; --i)
     {
-
       double duration = frames[i - 1].getStamp().toSec() - frame.getStamp().toSec();
       if (duration == 0.0)
       {
@@ -104,8 +100,8 @@ void Obstacles::clearOldFrames()
 }
 
 void Obstacles::processFrame(const object_msgs::ObjectsInBoxesConstPtr& detect,
-                          const object_analytics_msgs::TrackedObjectsConstPtr& track,
-                          const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc)
+                             const object_analytics_msgs::TrackedObjectsConstPtr& track,
+                             const object_analytics_msgs::ObjectsInBoxes3DConstPtr& loc)
 {
   /**< make sure old frames are already cleared first. */
   clearOldFrames();
@@ -115,9 +111,8 @@ void Obstacles::processFrame(const object_msgs::ObjectsInBoxesConstPtr& detect,
 
   CaObjectFrame new_frame(stamp, frame_id, nh_);
 
-  if (loc->objects_in_boxes.size() != 0 &&
-      track->tracked_objects.size() != 0 &&
-      detect->objects_vector.size() != 0) {
+  if (loc->objects_in_boxes.size() != 0 && track->tracked_objects.size() != 0 && detect->objects_vector.size() != 0)
+  {
     new_frame.addVector(detect->objects_vector);
     new_frame.addVector(track->tracked_objects);
     new_frame.addVector(loc->objects_in_boxes);
@@ -125,13 +120,12 @@ void Obstacles::processFrame(const object_msgs::ObjectsInBoxesConstPtr& detect,
 
     frames_.push_back(new_frame);
   }
-  
+
   new_frame.publish();
 }
 
 std::shared_ptr<CaObjectFrame> Obstacles::getInstance(ros::Time stamp, std::string frame_id)
 {
-
   ROS_INFO("Finding frame: FrameID=%s, Stamp=%10.8f", frame_id.c_str(), stamp.toSec());
   try
   {
@@ -145,10 +139,9 @@ std::shared_ptr<CaObjectFrame> Obstacles::getInstance(ros::Time stamp, std::stri
     }
 
     CaObjectFrame new_frame(stamp, frame_id, nh_);
-    //std::shared_ptr<CaObjectFrame> frame(new CaObjectFrame(stamp, frame_id, nh_));
+    // std::shared_ptr<CaObjectFrame> frame(new CaObjectFrame(stamp, frame_id, nh_));
     frames_.push_back(new_frame);
     return std::shared_ptr<CaObjectFrame>(&frames_.back());
-
   }
   catch (...)
   {
@@ -157,7 +150,6 @@ std::shared_ptr<CaObjectFrame> Obstacles::getInstance(ros::Time stamp, std::stri
     frames_.push_back(std::move(new_frame));
     return std::shared_ptr<CaObjectFrame>(std::move(&new_frame));
   }
-
 }
 
 bool Obstacles::findObjectFrame(ros::Time stamp, std::string frame_id, std::shared_ptr<CaObjectFrame>& frame_out)
@@ -191,4 +183,4 @@ bool Obstacles::addObjectFrame(CaObjectFrame*& frame)
 
   return ret;
 }
-} // namespace
+}  // namespace

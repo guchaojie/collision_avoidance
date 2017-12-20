@@ -34,7 +34,7 @@ class CaObjectFrame
 public:
   CaObjectFrame();
   CaObjectFrame(ros::NodeHandle nh);
-  CaObjectFrame(ros::Time& stamp, std::string& frame_id, ros::NodeHandle nh=ros::NodeHandle("~"));
+  CaObjectFrame(ros::Time& stamp, std::string& frame_id, ros::NodeHandle nh = ros::NodeHandle("~"));
   virtual ~CaObjectFrame();
 
   // init(ObjectVector& vector);
@@ -101,7 +101,10 @@ public:
   bool findMergedObjectByRoi(const ObjectRoi& roi, MergedObject& track);
   bool findMergedObjectById(const int id, MergedObject& out);
 
-  ObjectMergedVector& getMergedObjects(){return objects_merged_;};
+  ObjectMergedVector& getMergedObjects()
+  {
+    return objects_merged_;
+  };
 
   /** @brief Get the centroid of an object [Static Function]
    *  @param[in] ob The object to be calculated.
@@ -110,9 +113,9 @@ public:
   static geometry_msgs::Point32 getCentroid(MergedObject& ob)
   {
     geometry_msgs::Point32 out;
-    out.x = (ob.min.x + ob.max.x)/2;
-    out.y = (ob.min.y + ob.max.y)/2;
-    out.z = (ob.min.z + ob.max.z)/2;
+    out.x = (ob.min.x + ob.max.x) / 2;
+    out.y = (ob.min.y + ob.max.y) / 2;
+    out.z = (ob.min.z + ob.max.z) / 2;
     return out;
   }
 
@@ -123,7 +126,7 @@ public:
    *  @param[in] ob The merged object (from object pipeline) to be checked.
    *  @return true if the given object is in social type, otherwise false.
    */
-  bool isSocialObject(MergedObject& ob) ;
+  bool isSocialObject(MergedObject& ob);
 
 private:
   // void publishObjectsInGroup();
@@ -149,35 +152,33 @@ private:
 
   void initParameter(void);
 
-  //void configure(ca_policy1::CaObjectFrameConfig &config, uint32_t level);
-
-  ///@brief transform frame id which is archived from object topics and is generated for merged topics.
+  /**< @brief transform frame id which is archived from object topics and is generated for merged topics.*/
   std::string tf_frame_id_;
 
-  ///@brief time stamp which is archived from object topics and is generated for merged topics.
+  /**< @brief time stamp which is archived from object topics and is generated for merged topics.*/
   ros::Time stamp_;
 
   ros::NodeHandle nh_;
 
-  ///@brief vectors storing object info(detection, tracking and localization, got from object topics).
+  /**< @brief vectors storing object info(detection, tracking and localization, got from object topics).*/
   DetectionVector objects_detected_;
   TrackingVector objects_tracked_;
   LocalizationVector objects_localized_;
 
-  ros::Publisher merged_objects_pub_; ///@brief ros publisher for merged object topic.
-  ros::Publisher social_object_pub_; ///@brief ros publisher for social object topic.
-  ObjectMergedVector objects_merged_; ///@brief vector storing the merged objects.
-  bool published_; ///@brief published status for the merged topic vector. true means published.
+  ros::Publisher merged_objects_pub_;  /**<@brief ros publisher for merged object topic.*/
+  ros::Publisher social_object_pub_;   /**<@brief ros publisher for social object topic.*/
+  ObjectMergedVector objects_merged_;  /**<@brief vector storing the merged objects.*/
+  bool published_;                     /**<@brief published status for the merged topic vector. true means published.*/
 
   bool social_msg_enabled_;
   bool merged_op_msg_enabled_;
   double posibility_threshold_;
-  //dynamic_reconfigure::Server<ca_policy1::CaObjectFrameConfig>* server_;
-  //dynamic_reconfigure::Server<ca_policy1::CaObjectFrameConfig>::CallbackType cb_reconfigure_;
+  // dynamic_reconfigure::Server<ca_policy::CaObjectFrameConfig>* server_;
+  // dynamic_reconfigure::Server<ca_policy::CaObjectFrameConfig>::CallbackType cb_reconfigure_;
 
   bool is_merging_;
 
-  std::vector<std::string> social_filter_; //filter strings for social messages
+  std::vector<std::string> social_filter_;  // filter strings for social messages
 };
 
 }  // namespace

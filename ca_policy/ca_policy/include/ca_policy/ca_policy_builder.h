@@ -26,9 +26,7 @@
 
 namespace intelligent_ca
 {
-
-/** @brief This class manages the CA policies in use.
- * add, delete, set policy name, set current policy.
+/** @brief This class creates CA Policy instance by the given policy name.
  */
 class CaPolicyBuilder
 {
@@ -36,14 +34,17 @@ public:
   CaPolicyBuilder(){};
   virtual ~CaPolicyBuilder(){};
 
+  /** @brief Create CA policy instance by the given name.
+   *  @param[in] name the name of the CA policy to be created.
+   *  @return    the shared pointer of the created CA Policy instance.
+   */
   std::shared_ptr<CaPolicy> createInstance(const std::string name)
   {
-    if(name == "social")
+    if (name == "social")
       return std::make_shared<SocialCaPolicy>();
 
     return std::make_shared<NormalCaPolicy>();
   }
-
 };
 
 }  // namespace
