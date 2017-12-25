@@ -7,8 +7,8 @@ policy name as topic *ca_policy* and acts the behaviors set to the given policy.
 ## Inputs
 Intel ros\_object\_analytics is the default dependency package which provides the required topics. Actually,
 any component who produces such messages as below list can drive CA Policy module:
-	- [object_analytics_msgs](https://github.com/intel/ros_object_analytics/tree/master/object_analytics_msgs), and
-	- [movidius_ncs_msgs](https://github.com/intel/ros_intel_movidius_ncs/tree/devel/movidius_ncs_msgs)
+  * [object_analytics_msgs](https://github.com/intel/ros_object_analytics/tree/master/object_analytics_msgs)
+  * [movidius_ncs_msgs](https://github.com/intel/ros_intel_movidius_ncs/tree/devel/movidius_ncs_msgs)
 
 See below for the detailed message definition
 ### Camera based object detection message
