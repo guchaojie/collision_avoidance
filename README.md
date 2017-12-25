@@ -33,9 +33,9 @@ _Sonar data filter_ sub-component takes charge of sonar data correct check and f
 This folder holds navigation customization for turtlebot2 robot base, as well our pre-analysis
 result for POC robot base (say, water base) temporally.
 
-### <i class="icon-upload"></i> water_navigation (in design)
-This folder holds navigation customization for [water](www.yunji.com) robot base, as well our
-pre-analysis result for POC robot base (say, water base) temporally.
+### <i class="icon-upload"></i> water_navigation
+This folder holds navigation customization for [Water Robot Base](www.yunji.com) robot base, as well our
+pre-analysis result for POC robot base (say, water robot base) temporally.
 
 ### <i class="icon-upload"></i> sonar_filter
 This folder holds the simple linear filtering algorithm implementation. Currently, the filtering
@@ -72,6 +72,9 @@ tool](http://wiki.ros.org/catkin) to download related packages in your Linux mac
 ### 3. Build code
     cd ~/catkin_ws
     catkin_make
+> NOTE: _navigation layers_'s compiling depends on _navigation stack_. Before building it, please make sure navigation
+> stack is already in the including paths. [AMR_ros_navigation](https://github.intel.com/otc-rse/AMR_ros_navigation)
+> is recommended to use, in which some enhanced features are enabled.
 
 ### 4. Sourcing the ROS workspace
 After building the workspace, source it via:
