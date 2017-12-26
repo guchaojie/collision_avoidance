@@ -76,7 +76,17 @@ tool](http://wiki.ros.org/catkin) to download related packages in your Linux mac
 > stack is already in the including paths. [AMR_ros_navigation](https://github.intel.com/otc-rse/AMR_ros_navigation)
 > is recommended to use, in which some enhanced features are enabled.
 
-### 4. Sourcing the ROS workspace
+### 4. Install Package
+    cd ~/catkin_ws
+    catkin_make install
+> **NOTE:** navigation parameter files should be put into /opt/ca_policy folder before running ca_policy node.
+
+  ```bash
+       sudo mkdir -p /opt/ca_policy
+       sudo cp -rf ~/catkin_ws/src/AMR_ros_collision_avoidance/ca_policy/ca_policy/param /opt/ca_policy/
+  ```
+
+### 5. Sourcing the ROS workspace
 After building the workspace, source it via:
     source devel/setup.bash
 
