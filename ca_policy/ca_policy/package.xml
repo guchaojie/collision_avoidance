@@ -26,6 +26,7 @@ limitations under the License.
 
   <build_depend>roscpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
+  <build_depend>tf</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>object_bridge_msgs</build_depend>
   <build_depend>ca_policy_msgs</build_depend>
