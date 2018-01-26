@@ -42,9 +42,7 @@ This folder holds the simple linear filtering algorithm implementation. Currentl
 algorithm addresses the noise of sonar input, and filters them out.
 
 ### <i class="icon-upload"></i> ca_policy
-This folder holds the implementation of analyzing camera based object info and generating ca policy messages, on which
-the specific CA policy is enabled.
-
+By following Intel naming clearing policy. "ca_policy" has been moved to another git repo ([ros_moving_object](https://github.intel.com/otc-rse/ros_moving_object)) for opensource preparation.
 
 ### <i class="icon-upload"></i> navigation_layers
 This folder holds costmap2D plugins updated and/or created for AMR POC projects.
@@ -79,15 +77,10 @@ tool](http://wiki.ros.org/catkin) to download related packages in your Linux mac
 ### 4. Install Package
     cd ~/catkin_ws
     catkin_make install
-> **NOTE:** navigation parameter files should be put into /opt/ca_policy folder before running ca_policy node.
-
-  ```bash
-       sudo mkdir -p /opt/ca_policy
-       sudo cp -rf ~/catkin_ws/src/AMR_ros_collision_avoidance/ca_policy/ca_policy/param /opt/ca_policy/
-  ```
 
 ### 5. Sourcing the ROS workspace
 After building the workspace, source it via:
+
     source devel/setup.bash
 
 ## Security
