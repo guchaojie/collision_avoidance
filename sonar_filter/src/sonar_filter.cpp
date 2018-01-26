@@ -43,41 +43,89 @@ namespace intelligent_ca {
 
 
   SonarFilter::SonarFilter()
-    : nh_("~"), listener_(ros::Duration(10)),
-    last_sonar_data_(INVALID_SONAR_DATA), last_sonar_data_deprecated_(-1), count_index(0)
+    : nh_("~"), listener_(ros::Duration(10)), count_index1(0), count_index2(0), count_index3(0)
   {
-    scan_filtered_pub_ = nh_.advertise<sensor_msgs::Range>("/water_uavcan_master/sonar_filtered", 1);
-    scan_sub_ = nh_.subscribe("/water_uavcan_master/ultrasonic", 1000, &SonarFilter::update, this);
+    if (nh_.hasParam("SonarFilters"))
+    {
+      nh_.getParam("SonarFilters", filter_list);
+      for (int32_t i = 0; i < filter_list.size(); ++i)
+      {
+        std::string input_topic = static_cast<std::string>(filter_list[i]["subscribe"]);
+        std::string output_topic = static_cast<std::string>(filter_list[i]["publish"]);
+
+        switch (i) {
+          case 0:
+            scan_sub_.push_back(nh_.subscribe(input_topic, 1000, &SonarFilter::update1, this));
+            break;
+          case 1:
+            scan_sub_.push_back(nh_.subscribe(input_topic, 1000, &SonarFilter::update2, this));
+            break;
+          case 2: 
+            scan_sub_.push_back(nh_.subscribe(input_topic, 1000, &SonarFilter::update3, this));
+            break;
+          default:
+            ROS_WARN("Sonar Filter has no more channel to support data filtering");
+        }
+
+        ROS_INFO("SonarFilter: subscribed to topic %s", scan_sub_.back().getTopic().c_str());
+        scan_filtered_pub_.push_back(nh_.advertise<sensor_msgs::Range>(output_topic, 1));
+      }
+    }
 
     nh_.param<std::string>("base_frame", base_frame_, "/base_link");
-
-    sonar_dist_tolerance_ = 0.3; //TODO:control it in parameter
+    nh_.param<std::string>("ultrasonic_l1_frame", ultrasonic_l1_frame_, "");
+    nh_.param<std::string>("ultrasonic_m_frame", ultrasonic_m_frame_, "");
+    nh_.param<std::string>("ultrasonic_r1_frame", ultrasonic_r1_frame_, "");
   }
 
-  void SonarFilter::update(const sensor_msgs::Range& input_scan)
+  void SonarFilter::handleSonarData(sensor_msgs::Range& data,
+          std::vector<float>& distance_array, int& count_index)
   {
 
-   sensor_msgs::Range output_scan = input_scan;
-
-   if (checkCorrectSonarDataAndSet(output_scan)) {
-      publishSonarData(output_scan);
+    if (checkCorrectSonarDataAndSet(data, distance_array, count_index)) {
+      publishSonarData(data);
     } else {
       ROS_WARN("Abnormal Sonar data, do nothing but keep monitoring!");
     }
+  }
 
-    /**
-     * FIXME: Don't do anything for obstacle possiblity prediction, even if for redundent logging.
-    if (getPossibilityOfObstacle() >= POSSIBILITY_MED ){
-      ROS_WARN("Probably meet an obstacle, keep monitoring!");
-    }*/
+  void SonarFilter::update1(const sensor_msgs::Range& input_scan)
+  {
+    sensor_msgs::Range output_scan = input_scan;
+
+    handleSonarData(output_scan, distance_array1, count_index1);
+  }
+
+  void SonarFilter::update2(const sensor_msgs::Range& input_scan)
+  {
+    sensor_msgs::Range output_scan = input_scan;
+
+    handleSonarData(output_scan, distance_array2, count_index2);
+  }
+
+  void SonarFilter::update3(const sensor_msgs::Range& input_scan)
+  {
+    sensor_msgs::Range output_scan = input_scan;
+
+    handleSonarData(output_scan, distance_array3, count_index3);
   }
 
   void SonarFilter::publishSonarData(const sensor_msgs::Range& pub)
   {
-    scan_filtered_pub_.publish(pub);
+    for (int32_t i = 0; i < filter_list.size(); ++i)
+    {
+      std::string input_topic = static_cast<std::string>(filter_list[i]["subscribe"]);
+      std::size_t found = input_topic.find(pub.header.frame_id);
+      if (found != std::string::npos) {
+   //   ROS_INFO("SonarFilter: published to topic %s", scan_filtered_pub_[i].getTopic().c_str());
+        scan_filtered_pub_[i].publish(pub);
+        break;
+      }
+    }
   }
 
-  bool SonarFilter::checkCorrectSonarDataAndSet(sensor_msgs::Range& data)
+  bool SonarFilter::checkCorrectSonarDataAndSet(sensor_msgs::Range& data,
+          std::vector<float>& distance_array, int& count_index)
   {
 
     if (count_index < FILTER_NUMBER) {
@@ -87,7 +135,7 @@ namespace intelligent_ca {
     }
     else {
       for(int i = 0;i < (FILTER_NUMBER-1); i++) {
-	  distance_array[i]=distance_array[i+1];
+      distance_array[i]=distance_array[i+1];
       }
 
       distance_array[FILTER_NUMBER-1] = data.range;
@@ -110,7 +158,10 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "sonar_filter_node");
 
   intelligent_ca::SonarFilter filter;
-  ros::spin();
+  ros::MultiThreadedSpinner s(3);
+  ros::spin(s);
+
+  return 0;
 }
 
 

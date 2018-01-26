@@ -1,0 +1,10 @@
+SonarFilters:
+   - {subscribe: "/water_uavcan_master/ultrasonic_l1", publish: "/water_uavcan_master/sonar_filtered_l1"}
+   - {subscribe: "/water_uavcan_master/ultrasonic_m",  publish: "/water_uavcan_master/sonar_filtered_m"}
+   - {subscribe: "/water_uavcan_master/ultrasonic_r1", publish: "/water_uavcan_master/sonar_filtered_r1"}
+
+base_frame: /base_link
+ultrasonic_l1_frame: ultrasonic_l1
+ultrasonic_m_frame:  ultrasonic_m
+ultrasonic_r1_frame: ultrasonic_r1
+
