@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="sonar_filter" name="sonar_filter" type="sonar_filter_node" output="screen">
+    <rosparam file="$(find sonar_filter)/param/sonar_filter.yaml" command="load" />
+  </node>
+</launch>

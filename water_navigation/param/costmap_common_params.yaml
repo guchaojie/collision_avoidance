@@ -52,7 +52,7 @@ static_layer:
   enabled:              true
   
 sonar:
-  topics:                ['/water_uavcan_master/sonar_filtered']
+  topics:                ['/water_uavcan_master/sonar_filtered_m', '/water_uavcan_master/sonar_filtered_l1', '/water_uavcan_master/sonar_filtered_r1']
   no_reading_timeout:    0.0
   clear_threshold:       0.2
   mark_threshold:        0.8
