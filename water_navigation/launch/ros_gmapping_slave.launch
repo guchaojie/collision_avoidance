@@ -1,6 +1,6 @@
 <launch>
   <!-- sonar filter -->
-  <node pkg="sonar_filter" name="sonar_filter_node" type="sonar_filter_node" />
+  <include file="$(find sonar_filter)/launch/sonar_filter.launch" />
 
   <!-- Gmapping -->
   <arg name="custom_gmapping_launch_file" default="$(find water_navigation)/launch/includes/gmapping/ros_gmapping.slave.launch.xml"/>
