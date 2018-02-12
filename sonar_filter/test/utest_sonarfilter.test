@@ -1,0 +1,31 @@
+<!--
+Copyright (c) 2017 Intel Corporation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<launch>
+<!-- sonar filter -->
+  <arg name="path" default="$(find sonar_filter)/test/sonar_filter_test.bag" />
+  <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg path)" />
+  <include file="$(find sonar_filter)/launch/sonar_filter.launch" />
+
+  <test test-name="utest_sonarfilter" pkg="sonar_filter" type="utest_sonarfilter">
+     <param name="ultra_m" value="/water_uavcan_master/ultrasonic_m" />
+     <param name="ultra_l" value="/water_uavcan_master/ultrasonic_l1" />
+     <param name="ultra_r" value="/water_uavcan_master/ultrasonic_r1" />
+     <param name="ultrafilter_m" value="/water_uavcan_master/sonar_filtered_m" />
+     <param name="ultrafilter_l" value="/water_uavcan_master/sonar_filtered_l1" />
+     <param name="ultrafilter_r" value="/water_uavcan_master/sonar_filtered_r1" />
+  </test>
+</launch>
