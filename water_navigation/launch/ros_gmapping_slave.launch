@@ -9,6 +9,4 @@
   <!-- Move base -->
   <include file="$(find water_navigation)/launch/includes/move_base.slave.launch.xml"/>
 
-  <!-- CA Policy -->
-  <include file="$(find water_navigation)/launch/water_policy.launch"/>
 </launch>
